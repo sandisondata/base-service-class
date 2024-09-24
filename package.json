@@ -1,0 +1,34 @@
+{
+  "name": "repository-service-class",
+  "version": "1.0.0",
+  "description": "Repository service class",
+  "author": "Grant Fortington",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix"
+  },
+  "dependencies": {
+    "database": "github:sandisondata/database",
+    "database-helpers": "github:sandisondata/database-helpers",
+    "node-debug": "github:gwfortington/node-debug",
+    "node-utilities": "github:gwfortington/node-utilities"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.6",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "prettier": "^3.3.2",
+    "rimraf": "^6.0.0"
+  },
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

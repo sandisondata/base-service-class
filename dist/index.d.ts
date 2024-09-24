@@ -1,0 +1,34 @@
+import { Query } from 'database';
+export type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
+export type UpdateData<Data> = Partial<Data>;
+export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> & Required<Data> & Required<System>;
+export declare abstract class Service<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
+    readonly debugSource: string;
+    readonly tableName: string;
+    readonly primaryKeyColumnNames: string[];
+    readonly dataColumnNames: string[];
+    readonly systemColumnNames: string[];
+    columnNames: string[];
+    query: Query;
+    primaryKey: PrimaryKey;
+    createData: CreateData<PrimaryKey, Data>;
+    updateData: UpdateData<Data>;
+    systemData: System;
+    row: Row<PrimaryKey, Data, System>;
+    constructor(debugSource: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], systemColumnNames?: string[]);
+    create(query: Query, createData: CreateData<PrimaryKey, Data>): Promise<Row<PrimaryKey, Data, System>>;
+    find(query: Query): Promise<void>;
+    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row<PrimaryKey, Data, System>>;
+    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData<Data>): Promise<Row<PrimaryKey, Data, System>>;
+    delete(query: Query, primaryKey: PrimaryKey): Promise<void>;
+    preCreate(): Promise<void>;
+    preFind(): Promise<void>;
+    preFindOne(): Promise<void>;
+    preUpdate(): Promise<void>;
+    preDelete(): Promise<void>;
+    postCreate(): Promise<void>;
+    postFind(): Promise<void>;
+    postFindOne(): Promise<void>;
+    postUpdate(): Promise<void>;
+    postDelete(): Promise<void>;
+}
