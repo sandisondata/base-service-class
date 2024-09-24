@@ -20,12 +20,6 @@ class AbstractService {
         this.primaryKeyColumnNames = primaryKeyColumnNames;
         this.dataColumnNames = dataColumnNames;
         this.systemColumnNames = systemColumnNames;
-        this.query = {};
-        this.primaryKey = {};
-        this.createData = {};
-        this.updateData = {};
-        this.systemData = {};
-        this.row = {};
         this.columnNames = [
             ...primaryKeyColumnNames,
             ...dataColumnNames,
@@ -37,7 +31,6 @@ class AbstractService {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.create`);
             debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}`);
-            this.query = query;
             this.primaryKey = (0, node_utilities_1.pick)(createData, this.primaryKeyColumnNames);
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
             this.createData = Object.assign({}, createData);
