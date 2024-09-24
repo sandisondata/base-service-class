@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Service = void 0;
+exports.AbstractService = void 0;
 const database_helpers_1 = require("database-helpers");
 const node_debug_1 = require("node-debug");
 const node_utilities_1 = require("node-utilities");
-class Service {
+class AbstractService {
     constructor(debugSource, tableName, primaryKeyColumnNames, dataColumnNames, systemColumnNames = []) {
         this.debugSource = debugSource;
         this.tableName = tableName;
@@ -158,4 +158,4 @@ class Service {
         return __awaiter(this, void 0, void 0, function* () { });
     }
 }
-exports.Service = Service;
+exports.AbstractService = AbstractService;
