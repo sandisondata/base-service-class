@@ -10,10 +10,12 @@ import { Debug, MessageType } from 'node-debug';
 import { objectsEqual, pick } from 'node-utilities';
 
 export type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
-export type UpdateData<Data> = Partial<Data>;
+
 export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> &
   Required<Data> &
   Required<System>;
+
+export type UpdateData<Data> = Partial<Data>;
 
 export abstract class Service<
   PrimaryKey extends Record<string, string | number>,
