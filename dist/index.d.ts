@@ -10,12 +10,12 @@ export declare abstract class AbstractService<PrimaryKey extends Record<string, 
     readonly dataColumnNames: string[];
     readonly systemColumnNames: string[];
     columnNames: string[];
-    query?: Query;
-    primaryKey?: PrimaryKey;
-    createData?: CreateData<PrimaryKey, Data>;
-    updateData?: UpdateData<Data>;
-    systemData?: System;
-    row?: Row<PrimaryKey, Data, System>;
+    query: Query;
+    primaryKey: PrimaryKey;
+    createData: CreateData<PrimaryKey, Data>;
+    updateData: UpdateData<Data>;
+    systemData: System;
+    row: Row<PrimaryKey, Data, System>;
     constructor(debugSource: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], systemColumnNames?: string[]);
     create(query: Query, createData: CreateData<PrimaryKey, Data>): Promise<Row<PrimaryKey, Data, System>>;
     find(query: Query): Promise<void>;

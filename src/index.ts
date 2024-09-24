@@ -25,12 +25,12 @@ export abstract class AbstractService<
   System extends Record<string, any>,
 > {
   columnNames: string[];
-  query?: Query;
-  primaryKey?: PrimaryKey;
-  createData?: CreateData<PrimaryKey, Data>;
-  updateData?: UpdateData<Data>;
-  systemData?: System;
-  row?: Row<PrimaryKey, Data, System>;
+  query!: Query;
+  primaryKey!: PrimaryKey;
+  createData!: CreateData<PrimaryKey, Data>;
+  updateData!: UpdateData<Data>;
+  systemData!: System;
+  row!: Row<PrimaryKey, Data, System>;
 
   constructor(
     readonly debugSource: string,
