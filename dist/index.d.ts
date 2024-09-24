@@ -2,7 +2,7 @@ import { Query } from 'database';
 export type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
 export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> & Required<Data> & Required<System>;
 export type UpdateData<Data> = Partial<Data>;
-export declare abstract class Service<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
+export declare abstract class Service<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, System extends Record<string, any>> {
     readonly debugSource: string;
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
