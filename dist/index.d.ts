@@ -1,4 +1,5 @@
 import { Query } from 'database';
+export { Query };
 export type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
 export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> & Required<Data> & Required<System>;
 export type UpdateData<Data> = Partial<Data>;

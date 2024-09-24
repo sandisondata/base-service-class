@@ -9,6 +9,8 @@ import {
 import { Debug, MessageType } from 'node-debug';
 import { objectsEqual, pick } from 'node-utilities';
 
+export { Query };
+
 export type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
 
 export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> &
