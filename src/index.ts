@@ -82,6 +82,7 @@ export abstract class RepositoryService<
     this.query = query;
     const debug = new Debug(`${this.debugSource}.find`);
     await this.preFind();
+    debug.write(MessageType.Step, 'Finding rows...');
     await this.postFind();
     debug.write(MessageType.Exit);
   }
@@ -96,6 +97,7 @@ export abstract class RepositoryService<
       `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
     );
     await this.preFindOne();
+    debug.write(MessageType.Step, 'Finding row...');
     this.row = (await findByPrimaryKey(
       this.query,
       this.tableName,
