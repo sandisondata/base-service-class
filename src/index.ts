@@ -19,18 +19,18 @@ export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> &
 
 export type UpdateData<Data> = Partial<Data>;
 
-export abstract class AbstractService<
+export abstract class Service<
   PrimaryKey extends Record<string, string | number>,
   Data extends Record<string, any>,
   System extends Record<string, any>,
 > {
   columnNames: string[];
-  query: Query;
-  primaryKey: PrimaryKey;
-  createData: CreateData<PrimaryKey, Data>;
-  updateData: UpdateData<Data>;
-  systemData: System;
-  row: Row<PrimaryKey, Data, System>;
+  query: Query = {} as Query;
+  primaryKey: PrimaryKey = {} as PrimaryKey;
+  createData: CreateData<PrimaryKey, Data> = {} as CreateData<PrimaryKey, Data>;
+  updateData: UpdateData<Data> = {} as UpdateData<Data>;
+  systemData: System = {} as System;
+  row: Row<PrimaryKey, Data, System> = {} as Row<PrimaryKey, Data, System>;
 
   constructor(
     readonly debugSource: string,
@@ -44,12 +44,6 @@ export abstract class AbstractService<
       ...dataColumnNames,
       ...systemColumnNames,
     ];
-    this.query = {} as Query;
-    this.primaryKey = {} as PrimaryKey;
-    this.createData = {} as CreateData<PrimaryKey, Data>;
-    this.updateData = {} as UpdateData<Data>;
-    this.systemData = {} as System;
-    this.row = {} as Row<PrimaryKey, Data, System>;
   }
 
   async create(query: Query, createData: CreateData<PrimaryKey, Data>) {
