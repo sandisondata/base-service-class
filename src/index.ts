@@ -19,7 +19,7 @@ export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> &
 
 export type UpdateData<Data> = Partial<Data>;
 
-export abstract class Service<
+export abstract class RepositoryService<
   PrimaryKey extends Record<string, string | number>,
   Data extends Record<string, any>,
   System extends Record<string, any> = Record<string, never>,
