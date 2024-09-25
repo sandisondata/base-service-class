@@ -16,6 +16,7 @@ export declare abstract class RepositoryService<PrimaryKey extends Record<string
     updateData: UpdateData<Data>;
     systemData: System;
     row: Row<PrimaryKey, Data, System>;
+    oldRow: Row<PrimaryKey, Data, System>;
     constructor(debugSource: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], systemColumnNames?: string[]);
     create(query: Query, createData: CreateData<PrimaryKey, Data>): Promise<Row<PrimaryKey, Data, System>>;
     find(query: Query): Promise<void>;

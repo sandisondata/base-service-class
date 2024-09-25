@@ -26,6 +26,7 @@ class RepositoryService {
         this.updateData = {};
         this.systemData = {};
         this.row = {};
+        this.oldRow = {};
         this.columnNames = [
             ...primaryKeyColumnNames,
             ...dataColumnNames,
@@ -59,6 +60,7 @@ class RepositoryService {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.find`);
             yield this.preFind();
+            debug.write(node_debug_1.MessageType.Step, 'Finding rows...');
             yield this.postFind();
             debug.write(node_debug_1.MessageType.Exit);
         });
@@ -71,6 +73,7 @@ class RepositoryService {
             this.primaryKey = Object.assign({}, primaryKey);
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
             yield this.preFindOne();
+            debug.write(node_debug_1.MessageType.Step, 'Finding row...');
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
                 columnNames: this.columnNames,
             }));
@@ -98,6 +101,7 @@ class RepositoryService {
             if (!(0, node_utilities_1.objectsEqual)((0, node_utilities_1.pick)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pick)(this.row, this.dataColumnNames))) {
                 yield this.preUpdate();
                 debug.write(node_debug_1.MessageType.Step, 'Updating row...');
+                this.oldRow = Object.assign({}, this.row);
                 this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign({}, this.updateData), this.systemData), this.columnNames));
                 debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
                 yield this.postUpdate();

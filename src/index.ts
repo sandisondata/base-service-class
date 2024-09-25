@@ -31,6 +31,7 @@ export abstract class RepositoryService<
   updateData: UpdateData<Data> = {} as UpdateData<Data>;
   systemData: System = {} as System;
   row: Row<PrimaryKey, Data, System> = {} as Row<PrimaryKey, Data, System>;
+  oldRow: Row<PrimaryKey, Data, System> = {} as Row<PrimaryKey, Data, System>;
 
   constructor(
     readonly debugSource: string,
@@ -146,6 +147,7 @@ export abstract class RepositoryService<
     ) {
       await this.preUpdate();
       debug.write(MessageType.Step, 'Updating row...');
+      this.oldRow = Object.assign({}, this.row);
       this.row = (await updateRow(
         this.query,
         this.tableName,
