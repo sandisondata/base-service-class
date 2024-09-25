@@ -25,6 +25,12 @@ class AbstractService {
             ...dataColumnNames,
             ...systemColumnNames,
         ];
+        this.query = {};
+        this.primaryKey = {};
+        this.createData = {};
+        this.updateData = {};
+        this.systemData = {};
+        this.row = {};
     }
     create(query, createData) {
         return __awaiter(this, void 0, void 0, function* () {
