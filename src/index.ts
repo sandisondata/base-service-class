@@ -101,7 +101,7 @@ export abstract class RepositoryService<
       this.tableName,
       this.primaryKey,
       {
-        columnNames: [],
+        columnNames: this.columnNames,
       },
     )) as Row<PrimaryKey, Data, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);

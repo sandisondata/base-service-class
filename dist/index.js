@@ -72,7 +72,7 @@ class RepositoryService {
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
             yield this.preFindOne();
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
-                columnNames: [],
+                columnNames: this.columnNames,
             }));
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
             yield this.postFindOne();
