@@ -19,7 +19,6 @@ declare abstract class Service<PrimaryKey extends Record<string, string | number
     query: Query;
     primaryKey: PrimaryKey;
     createData: CreateData<PrimaryKey, Data>;
-    audit: Audit;
     system: System;
     row: Row<PrimaryKey, Data, isAuditable, System>;
     updateData: UpdateData<Data>;

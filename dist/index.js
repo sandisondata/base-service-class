@@ -39,7 +39,6 @@ class Service {
         this.query = {};
         this.primaryKey = {};
         this.createData = {};
-        this.audit = {};
         this.system = {};
         this.row = {};
         this.updateData = {};
@@ -77,14 +76,14 @@ class Service {
                 yield (0, database_helpers_1.checkPrimaryKey)(this.query, this.tableName, this.primaryKey);
             }
             this.createData = Object.assign({}, createData);
-            this.audit = {};
-            if (this.isAuditable && typeof userUUId !== 'undefined') {
-                this.audit.created_by = this.audit.last_updated_by = userUUId;
-            }
             this.system = {};
             yield this.preCreate();
             debug.write(node_debug_1.MessageType.Step, 'Creating row...');
-            this.row = (yield (0, database_helpers_1.createRow)(this.query, this.tableName, Object.assign(Object.assign(Object.assign({}, this.createData), this.audit), this.system), this.columnNames));
+            const audit = {};
+            if (this.isAuditable && typeof userUUId !== 'undefined') {
+                audit.created_by = audit.last_updated_by = userUUId;
+            }
+            this.row = (yield (0, database_helpers_1.createRow)(this.query, this.tableName, Object.assign(Object.assign(Object.assign({}, this.createData), this.system), audit), this.columnNames));
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
             yield this.postCreate();
             debug.write(node_debug_1.MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
@@ -155,18 +154,18 @@ class Service {
             const mergedRow = Object.assign({}, this.row, this.updateData);
             if (!(0, node_utilities_1.areObjectsEqual)((0, node_utilities_1.pickObjectKeys)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pickObjectKeys)(this.row, this.dataColumnNames))) {
                 this.updateData = Object.assign({}, updateData);
-                this.audit = {};
-                if (this.isAuditable) {
-                    this.audit.last_update_date = new Date();
-                    if (typeof userUUId !== 'undefined') {
-                        this.audit.last_updated_by = userUUId;
-                    }
-                }
                 this.system = {};
                 yield this.preUpdate();
                 debug.write(node_debug_1.MessageType.Step, 'Updating row...');
                 this.oldRow = Object.assign({}, this.row);
-                this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData), this.audit), this.system), this.columnNames));
+                const audit = {};
+                if (this.isAuditable) {
+                    audit.last_update_date = new Date();
+                    if (typeof userUUId !== 'undefined') {
+                        audit.last_updated_by = userUUId;
+                    }
+                }
+                this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData), this.system), audit), this.columnNames));
                 debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
                 yield this.postUpdate();
             }
