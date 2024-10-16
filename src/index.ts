@@ -32,7 +32,7 @@ type Row<PrimaryKey, Data, isAuditable, System> = Required<PrimaryKey> &
 
 type UpdateData<Data> = Partial<Data>;
 
-abstract class Service<
+abstract class BaseService<
   PrimaryKey extends Record<string, string | number>,
   Data extends Record<string, any>,
   isAuditable extends boolean = true,
@@ -330,4 +330,4 @@ abstract class Service<
   async postDelete(): Promise<void> {}
 }
 
-export { CreateData, Query, Row, Service, UpdateData };
+export { BaseService, CreateData, Query, Row, UpdateData };

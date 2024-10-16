@@ -8,7 +8,7 @@ type Audit = {
 };
 type Row<PrimaryKey, Data, isAuditable, System> = Required<PrimaryKey> & Required<Data> & (isAuditable extends true ? Required<Audit> : Record<string, never>) & Required<System>;
 type UpdateData<Data> = Partial<Data>;
-declare abstract class Service<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, isAuditable extends boolean = true, System extends Record<string, any> = Record<string, never>> {
+declare abstract class BaseService<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, isAuditable extends boolean = true, System extends Record<string, any> = Record<string, never>> {
     readonly debugSource: string;
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
@@ -121,4 +121,4 @@ declare abstract class Service<PrimaryKey extends Record<string, string | number
      */
     postDelete(): Promise<void>;
 }
-export { CreateData, Query, Row, Service, UpdateData };
+export { BaseService, CreateData, Query, Row, UpdateData };

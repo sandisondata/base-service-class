@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Service = void 0;
+exports.BaseService = void 0;
 const database_helpers_1 = require("database-helpers");
 const node_debug_1 = require("node-debug");
 const node_utilities_1 = require("node-utilities");
@@ -19,7 +19,7 @@ const auditColumnNames = [
     'last_update_date',
     'last_updated_by',
 ];
-class Service {
+class BaseService {
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages
@@ -268,4 +268,4 @@ class Service {
         return __awaiter(this, void 0, void 0, function* () { });
     }
 }
-exports.Service = Service;
+exports.BaseService = BaseService;
