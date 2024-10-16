@@ -330,4 +330,4 @@ abstract class Service<
   async postDelete(): Promise<void> {}
 }
 
-export { Query, CreateData, Row, UpdateData, Service };
+export { CreateData, Query, Row, Service, UpdateData };

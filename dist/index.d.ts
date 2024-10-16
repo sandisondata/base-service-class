@@ -121,4 +121,4 @@ declare abstract class Service<PrimaryKey extends Record<string, string | number
      */
     postDelete(): Promise<void>;
 }
-export { Query, CreateData, Row, UpdateData, Service };
+export { CreateData, Query, Row, Service, UpdateData };
