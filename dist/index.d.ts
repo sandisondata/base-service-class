@@ -19,9 +19,9 @@ declare abstract class Service<PrimaryKey extends Record<string, string | number
     query: Query;
     primaryKey: PrimaryKey;
     createData: CreateData<PrimaryKey, Data>;
-    updateData: UpdateData<Data>;
     system: System;
     row: Row<PrimaryKey, Data, isAuditable, System>;
+    updateData: UpdateData<Data>;
     oldRow: Row<PrimaryKey, Data, isAuditable, System>;
     /**
      * Constructs a new instance of the Service class.

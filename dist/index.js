@@ -19,7 +19,6 @@ const auditColumnNames = [
     'last_update_date',
     'last_updated_by',
 ];
-const nilUUId = '00000000-0000-0000-0000-000000000000';
 class Service {
     /**
      * Constructs a new instance of the Service class.
@@ -40,9 +39,9 @@ class Service {
         this.query = {};
         this.primaryKey = {};
         this.createData = {};
-        this.updateData = {};
         this.system = {};
         this.row = {};
+        this.updateData = {};
         this.oldRow = {};
         /**
          * The columnNames property is an array of column names in the database table
@@ -68,20 +67,20 @@ class Service {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.create`);
-            debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}`);
+            debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}` +
+                (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''));
             this.primaryKey = (0, node_utilities_1.pickObjectKeys)(createData, this.primaryKeyColumnNames);
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
-            this.createData = Object.assign({}, createData);
-            this.system = {};
             if (Object.keys(this.primaryKey).length) {
                 debug.write(node_debug_1.MessageType.Step, 'Checking primary key...');
                 yield (0, database_helpers_1.checkPrimaryKey)(this.query, this.tableName, this.primaryKey);
             }
+            this.createData = Object.assign({}, createData);
             const audit = {};
-            if (this.isAuditable) {
-                audit.creation_date = audit.last_update_date = new Date();
-                audit.created_by = audit.last_updated_by = userUUId || nilUUId;
+            if (this.isAuditable && typeof userUUId !== 'undefined') {
+                audit.created_by = audit.last_updated_by = userUUId;
             }
+            this.system = {};
             yield this.preCreate();
             debug.write(node_debug_1.MessageType.Step, 'Creating row...');
             this.row = (yield (0, database_helpers_1.createRow)(this.query, this.tableName, Object.assign(Object.assign(Object.assign({}, this.createData), audit), this.system), this.columnNames));
@@ -142,10 +141,10 @@ class Service {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.update`);
-            debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)};updateData=${JSON.stringify(updateData)}`);
+            debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)};` +
+                `updateData=${JSON.stringify(updateData)}` +
+                (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''));
             this.primaryKey = Object.assign({}, primaryKey);
-            this.updateData = Object.assign({}, updateData);
-            this.system = {};
             debug.write(node_debug_1.MessageType.Step, 'Finding row by primary key...');
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
                 columnNames: this.columnNames,
@@ -154,11 +153,15 @@ class Service {
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
             const mergedRow = Object.assign({}, this.row, this.updateData);
             if (!(0, node_utilities_1.areObjectsEqual)((0, node_utilities_1.pickObjectKeys)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pickObjectKeys)(this.row, this.dataColumnNames))) {
+                this.updateData = Object.assign({}, updateData);
                 const audit = {};
                 if (this.isAuditable) {
                     audit.last_update_date = new Date();
-                    audit.last_updated_by = userUUId || nilUUId;
+                    if (typeof userUUId !== 'undefined') {
+                        audit.last_updated_by = userUUId;
+                    }
                 }
+                this.system = {};
                 yield this.preUpdate();
                 debug.write(node_debug_1.MessageType.Step, 'Updating row...');
                 this.oldRow = Object.assign({}, this.row);

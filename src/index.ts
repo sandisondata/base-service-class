@@ -25,8 +25,6 @@ const auditColumnNames = [
   'last_updated_by',
 ];
 
-const nilUUId = '00000000-0000-0000-0000-000000000000';
-
 type Row<PrimaryKey, Data, isAuditable, System> = Required<PrimaryKey> &
   Required<Data> &
   (isAuditable extends true ? Required<Audit> : Record<string, never>) &
@@ -44,9 +42,9 @@ abstract class Service<
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
   createData = {} as CreateData<PrimaryKey, Data>;
-  updateData = {} as UpdateData<Data>;
   system = {} as System;
   row = {} as Row<PrimaryKey, Data, isAuditable, System>;
+  updateData = {} as UpdateData<Data>;
   oldRow = {} as Row<PrimaryKey, Data, isAuditable, System>;
 
   /**
@@ -94,7 +92,11 @@ abstract class Service<
   ) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
-    debug.write(MessageType.Entry, `createData=${JSON.stringify(createData)}`);
+    debug.write(
+      MessageType.Entry,
+      `createData=${JSON.stringify(createData)}` +
+        (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''),
+    );
     this.primaryKey = pickObjectKeys(
       createData,
       this.primaryKeyColumnNames,
@@ -103,17 +105,16 @@ abstract class Service<
       MessageType.Value,
       `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
     );
-    this.createData = Object.assign({}, createData);
-    this.system = {} as System;
     if (Object.keys(this.primaryKey).length) {
       debug.write(MessageType.Step, 'Checking primary key...');
       await checkPrimaryKey(this.query, this.tableName, this.primaryKey);
     }
+    this.createData = Object.assign({}, createData);
     const audit = {} as Audit;
-    if (this.isAuditable) {
-      audit.creation_date = audit.last_update_date = new Date();
-      audit.created_by = audit.last_updated_by = userUUId || nilUUId;
+    if (this.isAuditable && typeof userUUId !== 'undefined') {
+      audit.created_by = audit.last_updated_by = userUUId;
     }
+    this.system = {} as System;
     await this.preCreate();
     debug.write(MessageType.Step, 'Creating row...');
     this.row = (await createRow(
@@ -191,11 +192,11 @@ abstract class Service<
     const debug = new Debug(`${this.debugSource}.update`);
     debug.write(
       MessageType.Entry,
-      `primaryKey=${JSON.stringify(primaryKey)};updateData=${JSON.stringify(updateData)}`,
+      `primaryKey=${JSON.stringify(primaryKey)};` +
+        `updateData=${JSON.stringify(updateData)}` +
+        (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''),
     );
     this.primaryKey = Object.assign({}, primaryKey);
-    this.updateData = Object.assign({}, updateData);
-    this.system = {} as System;
     debug.write(MessageType.Step, 'Finding row by primary key...');
     this.row = (await findByPrimaryKey(
       this.query,
@@ -214,11 +215,15 @@ abstract class Service<
         pickObjectKeys(this.row, this.dataColumnNames),
       )
     ) {
+      this.updateData = Object.assign({}, updateData);
       const audit = {} as Audit;
       if (this.isAuditable) {
         audit.last_update_date = new Date();
-        audit.last_updated_by = userUUId || nilUUId;
+        if (typeof userUUId !== 'undefined') {
+          audit.last_updated_by = userUUId;
+        }
       }
+      this.system = {} as System;
       await this.preUpdate();
       debug.write(MessageType.Step, 'Updating row...');
       this.oldRow = Object.assign({}, this.row);
