@@ -19,6 +19,7 @@ declare abstract class Service<PrimaryKey extends Record<string, string | number
     query: Query;
     primaryKey: PrimaryKey;
     createData: CreateData<PrimaryKey, Data>;
+    audit: Audit;
     system: System;
     row: Row<PrimaryKey, Data, isAuditable, System>;
     updateData: UpdateData<Data>;
@@ -42,7 +43,7 @@ declare abstract class Service<PrimaryKey extends Record<string, string | number
      */
     create(query: Query, createData: CreateData<PrimaryKey, Data>, userUUId?: string): Promise<Row<PrimaryKey, Data, isAuditable, System>>;
     /**
-     * Finds all rows in the database table.
+     * Find rows in the database table.
      * @param query - a Query object for the database connection
      * @returns a Promise that resolves when the rows are found
      */

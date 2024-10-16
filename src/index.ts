@@ -42,6 +42,7 @@ abstract class Service<
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
   createData = {} as CreateData<PrimaryKey, Data>;
+  audit: Audit = {};
   system = {} as System;
   row = {} as Row<PrimaryKey, Data, isAuditable, System>;
   updateData = {} as UpdateData<Data>;
@@ -110,9 +111,9 @@ abstract class Service<
       await checkPrimaryKey(this.query, this.tableName, this.primaryKey);
     }
     this.createData = Object.assign({}, createData);
-    const audit = {} as Audit;
+    this.audit = {};
     if (this.isAuditable && typeof userUUId !== 'undefined') {
-      audit.created_by = audit.last_updated_by = userUUId;
+      this.audit.created_by = this.audit.last_updated_by = userUUId;
     }
     this.system = {} as System;
     await this.preCreate();
@@ -120,7 +121,7 @@ abstract class Service<
     this.row = (await createRow(
       this.query,
       this.tableName,
-      { ...this.createData, ...audit, ...this.system },
+      { ...this.createData, ...this.audit, ...this.system },
       this.columnNames,
     )) as Row<PrimaryKey, Data, isAuditable, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
@@ -130,7 +131,7 @@ abstract class Service<
   }
 
   /**
-   * Finds all rows in the database table.
+   * Find rows in the database table.
    * @param query - a Query object for the database connection
    * @returns a Promise that resolves when the rows are found
    */
@@ -216,11 +217,11 @@ abstract class Service<
       )
     ) {
       this.updateData = Object.assign({}, updateData);
-      const audit = {} as Audit;
+      this.audit = {};
       if (this.isAuditable) {
-        audit.last_update_date = new Date();
+        this.audit.last_update_date = new Date();
         if (typeof userUUId !== 'undefined') {
-          audit.last_updated_by = userUUId;
+          this.audit.last_updated_by = userUUId;
         }
       }
       this.system = {} as System;
@@ -231,7 +232,7 @@ abstract class Service<
         this.query,
         this.tableName,
         this.primaryKey,
-        { ...this.updateData, ...audit, ...this.system },
+        { ...this.updateData, ...this.audit, ...this.system },
         this.columnNames,
       )) as Row<PrimaryKey, Data, isAuditable, System>;
       debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
