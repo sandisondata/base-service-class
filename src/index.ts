@@ -7,51 +7,95 @@ import {
   updateRow,
 } from 'database-helpers';
 import { Debug, MessageType } from 'node-debug';
-import { objectsEqual, pick } from 'node-utilities';
+import { areObjectsEqual, pickObjectKeys } from 'node-utilities';
 
-export { Query };
+type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
 
-export type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
+type Audit = {
+  creation_date?: Date;
+  created_by?: string;
+  last_update_date?: Date;
+  last_updated_by?: string;
+};
 
-export type Row<PrimaryKey, Data, System> = Required<PrimaryKey> &
+const auditColumnNames = [
+  'creation_date',
+  'created_by',
+  'last_update_date',
+  'last_updated_by',
+];
+
+const nilUUId = '00000000-0000-0000-0000-000000000000';
+
+type Row<PrimaryKey, Data, isAuditable, System> = Required<PrimaryKey> &
   Required<Data> &
+  (isAuditable extends true ? Required<Audit> : Record<string, never>) &
   Required<System>;
 
-export type UpdateData<Data> = Partial<Data>;
+type UpdateData<Data> = Partial<Data>;
 
-export abstract class RepositoryService<
+abstract class Service<
   PrimaryKey extends Record<string, string | number>,
   Data extends Record<string, any>,
+  isAuditable extends boolean = true,
   System extends Record<string, any> = Record<string, never>,
 > {
   columnNames: string[];
-  query: Query = {} as Query;
-  primaryKey: PrimaryKey = {} as PrimaryKey;
-  createData: CreateData<PrimaryKey, Data> = {} as CreateData<PrimaryKey, Data>;
-  updateData: UpdateData<Data> = {} as UpdateData<Data>;
-  systemData: System = {} as System;
-  row: Row<PrimaryKey, Data, System> = {} as Row<PrimaryKey, Data, System>;
-  oldRow: Row<PrimaryKey, Data, System> = {} as Row<PrimaryKey, Data, System>;
+  query = {} as Query;
+  primaryKey = {} as PrimaryKey;
+  createData = {} as CreateData<PrimaryKey, Data>;
+  updateData = {} as UpdateData<Data>;
+  system = {} as System;
+  row = {} as Row<PrimaryKey, Data, isAuditable, System>;
+  oldRow = {} as Row<PrimaryKey, Data, isAuditable, System>;
 
+  /**
+   * Constructs a new instance of the Service class.
+   * @param debugSource - a string identifying the source of debug messages
+   * @param tableName - the name of the database table
+   * @param primaryKeyColumnNames - an array of column names that make up the primary key
+   * @param dataColumnNames - an array of column names that store data
+   * @param isAuditable - a boolean indicating if the table has audit columns
+   * @param systemColumnNames - an array of column names that store system data
+   */
   constructor(
     readonly debugSource: string,
     readonly tableName: string,
     readonly primaryKeyColumnNames: string[],
     readonly dataColumnNames: string[],
+    readonly isAuditable: boolean = true,
     readonly systemColumnNames: string[] = [],
   ) {
+    /**
+     * The columnNames property is an array of column names in the database table
+     * that are relevant to the Service class.
+     * It is a combination of the primary key columns, data columns,
+     * audit columns (if isAuditable is true), and system columns.
+     */
     this.columnNames = [
       ...primaryKeyColumnNames,
       ...dataColumnNames,
+      ...(isAuditable ? auditColumnNames : []),
       ...systemColumnNames,
     ];
   }
 
-  async create(query: Query, createData: CreateData<PrimaryKey, Data>) {
+  /**
+   * Creates a new row in the database table.
+   * @param query - a Query object for the database connection
+   * @param createData - the data to insert into the table
+   * @param userUUId - an optional user UUID to set in the audit columns
+   * @returns a Promise that resolves to the inserted row
+   */
+  async create(
+    query: Query,
+    createData: CreateData<PrimaryKey, Data>,
+    userUUId?: string,
+  ) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
     debug.write(MessageType.Entry, `createData=${JSON.stringify(createData)}`);
-    this.primaryKey = pick(
+    this.primaryKey = pickObjectKeys(
       createData,
       this.primaryKeyColumnNames,
     ) as PrimaryKey;
@@ -60,25 +104,35 @@ export abstract class RepositoryService<
       `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
     );
     this.createData = Object.assign({}, createData);
-    this.systemData = {} as System;
+    this.system = {} as System;
     if (Object.keys(this.primaryKey).length) {
       debug.write(MessageType.Step, 'Checking primary key...');
       await checkPrimaryKey(this.query, this.tableName, this.primaryKey);
+    }
+    const audit = {} as Audit;
+    if (this.isAuditable) {
+      audit.creation_date = audit.last_update_date = new Date();
+      audit.created_by = audit.last_updated_by = userUUId || nilUUId;
     }
     await this.preCreate();
     debug.write(MessageType.Step, 'Creating row...');
     this.row = (await createRow(
       this.query,
       this.tableName,
-      { ...this.createData, ...this.systemData },
+      { ...this.createData, ...audit, ...this.system },
       this.columnNames,
-    )) as Row<PrimaryKey, Data, System>;
+    )) as Row<PrimaryKey, Data, isAuditable, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.postCreate();
     debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
     return this.row;
   }
 
+  /**
+   * Finds all rows in the database table.
+   * @param query - a Query object for the database connection
+   * @returns a Promise that resolves when the rows are found
+   */
   async find(query: Query) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.find`);
@@ -88,6 +142,12 @@ export abstract class RepositoryService<
     debug.write(MessageType.Exit);
   }
 
+  /**
+   * Finds a single row in the database table by primary key.
+   * @param query - a Query object for the database connection
+   * @param primaryKey - the primary key of the row to find
+   * @returns a Promise that resolves to the found row
+   */
   async findOne(query: Query, primaryKey: PrimaryKey) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.findOne`);
@@ -106,18 +166,27 @@ export abstract class RepositoryService<
       {
         columnNames: this.columnNames,
       },
-    )) as Row<PrimaryKey, Data, System>;
+    )) as Row<PrimaryKey, Data, isAuditable, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.postFindOne();
     debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
     return this.row;
   }
 
+  /**
+   * Updates a single row in the database table by primary key.
+   * @param query - a Query object for the database connection
+   * @param primaryKey - the primary key of the row to update
+   * @param updateData - the data to update in the row
+   * @param userUUId - an optional user UUID to set in the audit columns
+   * @returns a Promise that resolves to the updated row
+   */
   async update(
     query: Query,
     primaryKey: PrimaryKey,
     updateData: UpdateData<Data>,
-  ) {
+    userUUId?: string,
+  ): Promise<Row<PrimaryKey, Data, isAuditable, System>> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.update`);
     debug.write(
@@ -126,7 +195,7 @@ export abstract class RepositoryService<
     );
     this.primaryKey = Object.assign({}, primaryKey);
     this.updateData = Object.assign({}, updateData);
-    this.systemData = {} as System;
+    this.system = {} as System;
     debug.write(MessageType.Step, 'Finding row by primary key...');
     this.row = (await findByPrimaryKey(
       this.query,
@@ -136,15 +205,20 @@ export abstract class RepositoryService<
         columnNames: this.columnNames,
         forUpdate: true,
       },
-    )) as Row<PrimaryKey, Data, System>;
+    )) as Row<PrimaryKey, Data, isAuditable, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     const mergedRow = Object.assign({}, this.row, this.updateData);
     if (
-      !objectsEqual(
-        pick(mergedRow, this.dataColumnNames),
-        pick(this.row, this.dataColumnNames),
+      !areObjectsEqual(
+        pickObjectKeys(mergedRow, this.dataColumnNames),
+        pickObjectKeys(this.row, this.dataColumnNames),
       )
     ) {
+      const audit = {} as Audit;
+      if (this.isAuditable) {
+        audit.last_update_date = new Date();
+        audit.last_updated_by = userUUId || nilUUId;
+      }
       await this.preUpdate();
       debug.write(MessageType.Step, 'Updating row...');
       this.oldRow = Object.assign({}, this.row);
@@ -152,9 +226,9 @@ export abstract class RepositoryService<
         this.query,
         this.tableName,
         this.primaryKey,
-        { ...this.updateData, ...this.systemData },
+        { ...this.updateData, ...audit, ...this.system },
         this.columnNames,
-      )) as Row<PrimaryKey, Data, System>;
+      )) as Row<PrimaryKey, Data, isAuditable, System>;
       debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
       await this.postUpdate();
     }
@@ -162,7 +236,13 @@ export abstract class RepositoryService<
     return this.row;
   }
 
-  async delete(query: Query, primaryKey: PrimaryKey) {
+  /**
+   * Deletes a row in the database table by primary key.
+   * @param query - a Query object for the database connection
+   * @param primaryKey - the primary key of the row to delete
+   * @returns a Promise that resolves when the row is deleted
+   */
+  async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.delete`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
@@ -175,7 +255,7 @@ export abstract class RepositoryService<
       {
         forUpdate: true,
       },
-    )) as Row<PrimaryKey, Data, System>;
+    )) as Row<PrimaryKey, Data, isAuditable, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.preDelete();
     debug.write(MessageType.Step, 'Deleting row...');
@@ -184,17 +264,65 @@ export abstract class RepositoryService<
     debug.write(MessageType.Exit);
   }
 
-  // Pre-hooks
-  async preCreate() {}
-  async preFind() {}
-  async preFindOne() {}
-  async preUpdate() {}
-  async preDelete() {}
+  /**
+   * Called before a row is inserted into the database table.
+   * @returns a Promise that resolves when the pre-hook is complete
+   */
+  async preCreate(): Promise<void> {}
 
-  // Post-hooks
-  async postCreate() {}
-  async postFind() {}
-  async postFindOne() {}
-  async postUpdate() {}
-  async postDelete() {}
+  /**
+   * Called before rows are found in the database table.
+   * @returns a Promise that resolves when the pre-hook is complete
+   */
+  async preFind(): Promise<void> {}
+
+  /**
+   * Called before a row is found in the database table by primary key.
+   * @returns a Promise that resolves when the pre-hook is complete
+   */
+  async preFindOne(): Promise<void> {}
+
+  /**
+   * Called before a row is updated in the database table.
+   * @returns a Promise that resolves when the pre-hook is complete
+   */
+  async preUpdate(): Promise<void> {}
+
+  /**
+   * Called before a row is deleted from the database table.
+   * @returns a Promise that resolves when the pre-hook is complete
+   */
+  async preDelete(): Promise<void> {}
+
+  /**
+   * Called after a row is inserted into the database table.
+   * @returns a Promise that resolves when the post-hook is complete
+   */
+  async postCreate(): Promise<void> {}
+
+  /**
+   * Called after rows are found in the database table.
+   * @returns a Promise that resolves when the post-hook is complete
+   */
+  async postFind(): Promise<void> {}
+
+  /**
+   * Called after a row is found in the database table by primary key.
+   * @returns a Promise that resolves when the post-hook is complete
+   */
+  async postFindOne(): Promise<void> {}
+
+  /**
+   * Called after a row is updated in the database table.
+   * @returns a Promise that resolves when the post-hook is complete
+   */
+  async postUpdate(): Promise<void> {}
+
+  /**
+   * Called after a row is deleted from the database table.
+   * @returns a Promise that resolves when the post-hook is complete
+   */
+  async postDelete(): Promise<void> {}
 }
+
+export { Query, CreateData, Row, UpdateData, Service };

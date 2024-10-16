@@ -1,7 +1,7 @@
 {
-  "name": "repository-service-class",
+  "name": "service-class",
   "version": "1.0.0",
-  "description": "Repository service class",
+  "description": "Service class",
   "author": "Grant Fortington",
   "private": true,
   "license": "MIT",
