@@ -64,15 +64,6 @@ abstract class BaseService<
     readonly isAuditable: boolean = true,
     readonly systemColumnNames: string[] = [],
   ) {
-    const debug = new Debug(debugSource);
-    debug.write(
-      MessageType.Entry,
-      `tableName=${tableName};` +
-        `primaryKeyColumnNames=${JSON.stringify(primaryKeyColumnNames)};` +
-        `dataColumnNames=${JSON.stringify(dataColumnNames)};` +
-        `isAuditable=${isAuditable};` +
-        `systemColumnNames=${JSON.stringify(systemColumnNames)}`,
-    );
     /**
      * The columnNames property is an array of column names in the database table
      * that are relevant to the Service class.
@@ -85,11 +76,6 @@ abstract class BaseService<
       ...(isAuditable ? auditColumnNames : []),
       ...systemColumnNames,
     ];
-    debug.write(
-      MessageType.Value,
-      `this.columnNames=${JSON.stringify(this.columnNames)}`,
-    );
-    debug.write(MessageType.Exit);
   }
 
   /**
