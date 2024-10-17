@@ -86,12 +86,12 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
      */
     preFindOne(): Promise<void>;
     /**
-     * Called before a row is updated in the database table.
+     * Called before a row is updated in the database table by primary key.
      * @returns a Promise that resolves when the pre-hook is complete
      */
     preUpdate(): Promise<void>;
     /**
-     * Called before a row is deleted from the database table.
+     * Called before a row is deleted from the database table by primary key.
      * @returns a Promise that resolves when the pre-hook is complete
      */
     preDelete(): Promise<void>;
@@ -111,12 +111,12 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
      */
     postFindOne(): Promise<void>;
     /**
-     * Called after a row is updated in the database table.
+     * Called after a row is updated in the database table by primary key.
      * @returns a Promise that resolves when the post-hook is complete
      */
     postUpdate(): Promise<void>;
     /**
-     * Called after a row is deleted from the database table.
+     * Called after a row is deleted from the database table by primary key.
      * @returns a Promise that resolves when the post-hook is complete
      */
     postDelete(): Promise<void>;

@@ -288,13 +288,13 @@ abstract class BaseService<
   async preFindOne(): Promise<void> {}
 
   /**
-   * Called before a row is updated in the database table.
+   * Called before a row is updated in the database table by primary key.
    * @returns a Promise that resolves when the pre-hook is complete
    */
   async preUpdate(): Promise<void> {}
 
   /**
-   * Called before a row is deleted from the database table.
+   * Called before a row is deleted from the database table by primary key.
    * @returns a Promise that resolves when the pre-hook is complete
    */
   async preDelete(): Promise<void> {}
@@ -318,13 +318,13 @@ abstract class BaseService<
   async postFindOne(): Promise<void> {}
 
   /**
-   * Called after a row is updated in the database table.
+   * Called after a row is updated in the database table by primary key.
    * @returns a Promise that resolves when the post-hook is complete
    */
   async postUpdate(): Promise<void> {}
 
   /**
-   * Called after a row is deleted from the database table.
+   * Called after a row is deleted from the database table by primary key.
    * @returns a Promise that resolves when the post-hook is complete
    */
   async postDelete(): Promise<void> {}

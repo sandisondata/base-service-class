@@ -219,14 +219,14 @@ class BaseService {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
-     * Called before a row is updated in the database table.
+     * Called before a row is updated in the database table by primary key.
      * @returns a Promise that resolves when the pre-hook is complete
      */
     preUpdate() {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
-     * Called before a row is deleted from the database table.
+     * Called before a row is deleted from the database table by primary key.
      * @returns a Promise that resolves when the pre-hook is complete
      */
     preDelete() {
@@ -254,14 +254,14 @@ class BaseService {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
-     * Called after a row is updated in the database table.
+     * Called after a row is updated in the database table by primary key.
      * @returns a Promise that resolves when the post-hook is complete
      */
     postUpdate() {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     /**
-     * Called after a row is deleted from the database table.
+     * Called after a row is deleted from the database table by primary key.
      * @returns a Promise that resolves when the post-hook is complete
      */
     postDelete() {
