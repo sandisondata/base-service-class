@@ -151,7 +151,7 @@ class BaseService {
                 forUpdate: true,
             }));
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
-            const mergedRow = Object.assign({}, this.row, this.updateData);
+            const mergedRow = Object.assign({}, this.row, updateData);
             if (!(0, node_utilities_1.areObjectsEqual)((0, node_utilities_1.pickObjectKeys)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pickObjectKeys)(this.row, this.dataColumnNames))) {
                 this.updateData = Object.assign({}, updateData);
                 this.system = {};

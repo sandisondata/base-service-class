@@ -208,7 +208,7 @@ abstract class BaseService<
       },
     )) as Row<PrimaryKey, Data, isAuditable, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
-    const mergedRow = Object.assign({}, this.row, this.updateData);
+    const mergedRow = Object.assign({}, this.row, updateData);
     if (
       !areObjectsEqual(
         pickObjectKeys(mergedRow, this.dataColumnNames),
