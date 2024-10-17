@@ -43,6 +43,12 @@ class BaseService {
         this.row = {};
         this.updateData = {};
         this.oldRow = {};
+        const debug = new node_debug_1.Debug(debugSource);
+        debug.write(node_debug_1.MessageType.Entry, `tableName=${tableName};` +
+            `primaryKeyColumnNames=${JSON.stringify(primaryKeyColumnNames)};` +
+            `dataColumnNames=${JSON.stringify(dataColumnNames)};` +
+            `isAuditable=${isAuditable};` +
+            `systemColumnNames=${JSON.stringify(systemColumnNames)}`);
         /**
          * The columnNames property is an array of column names in the database table
          * that are relevant to the Service class.
@@ -55,6 +61,8 @@ class BaseService {
             ...(isAuditable ? auditColumnNames : []),
             ...systemColumnNames,
         ];
+        debug.write(node_debug_1.MessageType.Value, `this.columnNames=${JSON.stringify(this.columnNames)}`);
+        debug.write(node_debug_1.MessageType.Exit);
     }
     /**
      * Creates a new row in the database table.
