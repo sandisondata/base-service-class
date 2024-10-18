@@ -9,8 +9,6 @@ import {
 import { Debug, MessageType } from 'node-debug';
 import { areObjectsEqual, pickObjectKeys } from 'node-utilities';
 
-export { Query };
-
 type Audit = {
   creation_date?: Date;
   created_by?: string;
@@ -25,11 +23,13 @@ const auditColumnNames = [
   'last_updated_by',
 ];
 
+export { Query };
+
 export abstract class BaseService<
   PrimaryKey extends Record<string, any>,
   CreateData extends Record<string, any>,
-  Row extends Record<string, any>,
   UpdateData extends Record<string, any>,
+  Row extends Record<string, any>,
   System extends Record<string, any> = Record<string, never>,
 > {
   columnNames: string[];
@@ -37,9 +37,9 @@ export abstract class BaseService<
   primaryKey = {} as PrimaryKey;
   createData = {} as CreateData;
   updateData = {} as UpdateData;
+  row = {} as Row;
   system = {} as System;
   oldRow = {} as Row;
-  row = {} as Row;
 
   /**
    * Constructs a new instance of the Service class.

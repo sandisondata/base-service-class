@@ -1,6 +1,6 @@
 import { Query } from 'database';
 export { Query };
-export declare abstract class BaseService<PrimaryKey extends Record<string, any>, CreateData extends Record<string, any>, Row extends Record<string, any>, UpdateData extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
+export declare abstract class BaseService<PrimaryKey extends Record<string, any>, CreateData extends Record<string, any>, UpdateData extends Record<string, any>, Row extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
     readonly debugSource: string;
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
@@ -12,9 +12,9 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     primaryKey: PrimaryKey;
     createData: CreateData;
     updateData: UpdateData;
+    row: Row;
     system: System;
     oldRow: Row;
-    row: Row;
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages
