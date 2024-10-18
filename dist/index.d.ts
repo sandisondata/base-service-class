@@ -15,12 +15,12 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, stri
     readonly systemColumnNames: string[];
     columnNames: string[];
     query: Query;
-    primaryKey: PrimaryKey;
-    system: System;
+    primaryKey: Required<PrimaryKey>;
     createData: CreateData;
     updateData: UpdateData;
-    row: Row;
+    system: System;
     oldRow: Row;
+    row: Row;
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages
@@ -51,7 +51,7 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, stri
      * @param primaryKey - the primary key of the row to find
      * @returns a Promise that resolves to the found row
      */
-    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row>;
+    findOne(query: Query, primaryKey: Required<PrimaryKey>): Promise<Row>;
     /**
      * Updates a single row in the database table by primary key.
      * @param query - a Query object for the database connection
@@ -60,14 +60,14 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, stri
      * @param userUUId - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the updated row
      */
-    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData, userUUId?: string): Promise<Row>;
+    update(query: Query, primaryKey: Required<PrimaryKey>, updateData: UpdateData, userUUId?: string): Promise<Row>;
     /**
      * Deletes a row in the database table by primary key.
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to delete
      * @returns a Promise that resolves when the row is deleted
      */
-    delete(query: Query, primaryKey: PrimaryKey): Promise<void>;
+    delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void>;
     /**
      * Called before a row is inserted into the database table.
      * @returns a Promise that resolves when the pre-hook is complete

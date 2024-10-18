@@ -39,7 +39,7 @@ export abstract class BaseService<
 > {
   columnNames: string[];
   query = {} as Query;
-  primaryKey = {} as PrimaryKey;
+  primaryKey = {} as Required<PrimaryKey>;
   createData = {} as CreateData;
   updateData = {} as UpdateData;
   system = {} as System;
@@ -95,7 +95,7 @@ export abstract class BaseService<
     this.primaryKey = pickObjectKeys(
       createData,
       this.primaryKeyColumnNames,
-    ) as PrimaryKey;
+    ) as Required<PrimaryKey>;
     debug.write(
       MessageType.Value,
       `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
@@ -144,7 +144,7 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to find
    * @returns a Promise that resolves to the found row
    */
-  async findOne(query: Query, primaryKey: PrimaryKey) {
+  async findOne(query: Query, primaryKey: Required<PrimaryKey>) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.findOne`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
@@ -179,7 +179,7 @@ export abstract class BaseService<
    */
   async update(
     query: Query,
-    primaryKey: PrimaryKey,
+    primaryKey: Required<PrimaryKey>,
     updateData: UpdateData,
     userUUId?: string,
   ): Promise<Row> {
@@ -245,7 +245,7 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to delete
    * @returns a Promise that resolves when the row is deleted
    */
-  async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
+  async delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.delete`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
