@@ -40,10 +40,10 @@ export abstract class BaseService<
   columnNames: string[];
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
-  system = {} as System;
   createData = {} as CreateData;
-  updateData = {} as UpdateData;
+  system = {} as System;
   row = {} as Row;
+  updateData = {} as UpdateData;
   oldRow = {} as Row;
 
   /**
@@ -212,8 +212,8 @@ export abstract class BaseService<
     ) {
       this.updateData = Object.assign(
         {},
-        pickObjectKeys(updateData, this.dataColumnNames),
-      ) as UpdateData;
+        pickObjectKeys(updateData, this.dataColumnNames) as UpdateData,
+      );
       this.system = {} as System;
       await this.preUpdate();
       debug.write(MessageType.Step, 'Updating row...');
