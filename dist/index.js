@@ -153,7 +153,7 @@ class BaseService {
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
             const mergedRow = Object.assign({}, this.row, updateData);
             if (!(0, node_utilities_1.areObjectsEqual)((0, node_utilities_1.pickObjectKeys)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pickObjectKeys)(this.row, this.dataColumnNames))) {
-                this.updateData = Object.assign({}, updateData);
+                this.updateData = Object.assign({}, (0, node_utilities_1.pickObjectKeys)(updateData, this.dataColumnNames));
                 this.system = {};
                 yield this.preUpdate();
                 debug.write(node_debug_1.MessageType.Step, 'Updating row...');
@@ -165,7 +165,7 @@ class BaseService {
                         audit.last_updated_by = userUUId;
                     }
                 }
-                this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData.filter((columnName) => this.dataColumnNames.includes(columnName))), this.system), audit), this.columnNames));
+                this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData), this.system), audit), this.columnNames));
                 debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
                 yield this.postUpdate();
             }

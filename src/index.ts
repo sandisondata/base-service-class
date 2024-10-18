@@ -210,7 +210,10 @@ export abstract class BaseService<
         pickObjectKeys(this.row, this.dataColumnNames),
       )
     ) {
-      this.updateData = Object.assign({}, updateData);
+      this.updateData = Object.assign(
+        {},
+        pickObjectKeys(updateData, this.dataColumnNames),
+      ) as UpdateData;
       this.system = {} as System;
       await this.preUpdate();
       debug.write(MessageType.Step, 'Updating row...');
@@ -226,13 +229,7 @@ export abstract class BaseService<
         this.query,
         this.tableName,
         this.primaryKey,
-        {
-          ...this.updateData.filter((columnName: string) =>
-            this.dataColumnNames.includes(columnName),
-          ),
-          ...this.system,
-          ...audit,
-        },
+        { ...this.updateData, ...this.system, ...audit },
         this.columnNames,
       )) as Row;
       debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
