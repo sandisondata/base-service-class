@@ -1,12 +1,6 @@
 import { Query } from 'database';
 export { Query };
-type Audit = {
-    creation_date?: Date;
-    created_by?: string;
-    last_update_date?: Date;
-    last_updated_by?: string;
-};
-export declare abstract class BaseService<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, isAuditable extends boolean = true, System extends Record<string, any> = Record<string, never>, CreateData extends Record<string, any> = PrimaryKey & Data, UpdateData extends Record<string, any> = Partial<Data>, Row extends Record<string, any> = Required<PrimaryKey> & Required<Data> & (isAuditable extends true ? Required<Audit> : Record<string, never>) & Required<System>> {
+export declare abstract class BaseService<PrimaryKey extends Record<string, string | number>, CreateData extends Record<string, any>, Row extends Record<string, any>, UpdateData extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
     readonly debugSource: string;
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
@@ -15,7 +9,7 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, stri
     readonly systemColumnNames: string[];
     columnNames: string[];
     query: Query;
-    primaryKey: Required<PrimaryKey>;
+    primaryKey: PrimaryKey;
     createData: CreateData;
     updateData: UpdateData;
     system: System;
@@ -51,7 +45,7 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, stri
      * @param primaryKey - the primary key of the row to find
      * @returns a Promise that resolves to the found row
      */
-    findOne(query: Query, primaryKey: Required<PrimaryKey>): Promise<Row>;
+    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row>;
     /**
      * Updates a single row in the database table by primary key.
      * @param query - a Query object for the database connection
@@ -60,14 +54,14 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, stri
      * @param userUUId - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the updated row
      */
-    update(query: Query, primaryKey: Required<PrimaryKey>, updateData: UpdateData, userUUId?: string): Promise<Row>;
+    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData, userUUId?: string): Promise<Row>;
     /**
      * Deletes a row in the database table by primary key.
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to delete
      * @returns a Promise that resolves when the row is deleted
      */
-    delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void>;
+    delete(query: Query, primaryKey: PrimaryKey): Promise<void>;
     /**
      * Called before a row is inserted into the database table.
      * @returns a Promise that resolves when the pre-hook is complete

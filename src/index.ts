@@ -27,19 +27,14 @@ const auditColumnNames = [
 
 export abstract class BaseService<
   PrimaryKey extends Record<string, string | number>,
-  Data extends Record<string, any>,
-  isAuditable extends boolean = true,
+  CreateData extends Record<string, any>,
+  Row extends Record<string, any>,
+  UpdateData extends Record<string, any>,
   System extends Record<string, any> = Record<string, never>,
-  CreateData extends Record<string, any> = PrimaryKey & Data,
-  UpdateData extends Record<string, any> = Partial<Data>,
-  Row extends Record<string, any> = Required<PrimaryKey> &
-    Required<Data> &
-    (isAuditable extends true ? Required<Audit> : Record<string, never>) &
-    Required<System>,
 > {
   columnNames: string[];
   query = {} as Query;
-  primaryKey = {} as Required<PrimaryKey>;
+  primaryKey = {} as PrimaryKey;
   createData = {} as CreateData;
   updateData = {} as UpdateData;
   system = {} as System;
@@ -95,7 +90,7 @@ export abstract class BaseService<
     this.primaryKey = pickObjectKeys(
       createData,
       this.primaryKeyColumnNames,
-    ) as Required<PrimaryKey>;
+    ) as PrimaryKey;
     debug.write(
       MessageType.Value,
       `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
@@ -144,7 +139,7 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to find
    * @returns a Promise that resolves to the found row
    */
-  async findOne(query: Query, primaryKey: Required<PrimaryKey>) {
+  async findOne(query: Query, primaryKey: PrimaryKey) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.findOne`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
@@ -179,7 +174,7 @@ export abstract class BaseService<
    */
   async update(
     query: Query,
-    primaryKey: Required<PrimaryKey>,
+    primaryKey: PrimaryKey,
     updateData: UpdateData,
     userUUId?: string,
   ): Promise<Row> {
@@ -245,7 +240,7 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to delete
    * @returns a Promise that resolves when the row is deleted
    */
-  async delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void> {
+  async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.delete`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
