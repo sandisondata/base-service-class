@@ -26,7 +26,7 @@ const auditColumnNames = [
 ];
 
 export abstract class BaseService<
-  PrimaryKey extends Record<string, string | number>,
+  PrimaryKey extends Record<string, any>,
   CreateData extends Record<string, any>,
   Row extends Record<string, any>,
   UpdateData extends Record<string, any>,
