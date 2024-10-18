@@ -165,7 +165,7 @@ class BaseService {
                         audit.last_updated_by = userUUId;
                     }
                 }
-                this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData), this.system), audit), this.columnNames));
+                this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData.filter((columnName) => this.dataColumnNames.includes(columnName))), this.system), audit), this.columnNames));
                 debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
                 yield this.postUpdate();
             }

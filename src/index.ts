@@ -226,7 +226,13 @@ export abstract class BaseService<
         this.query,
         this.tableName,
         this.primaryKey,
-        { ...this.updateData, ...this.system, ...audit },
+        {
+          ...this.updateData.filter((columnName: string) =>
+            this.dataColumnNames.includes(columnName),
+          ),
+          ...this.system,
+          ...audit,
+        },
         this.columnNames,
       )) as Row;
       debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
