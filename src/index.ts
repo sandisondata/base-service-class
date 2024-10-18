@@ -9,7 +9,7 @@ import {
 import { Debug, MessageType } from 'node-debug';
 import { areObjectsEqual, pickObjectKeys } from 'node-utilities';
 
-type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
+export { Query };
 
 type Audit = {
   creation_date?: Date;
@@ -25,27 +25,26 @@ const auditColumnNames = [
   'last_updated_by',
 ];
 
-type Row<PrimaryKey, Data, isAuditable, System> = Required<PrimaryKey> &
-  Required<Data> &
-  (isAuditable extends true ? Required<Audit> : Record<string, never>) &
-  Required<System>;
-
-type UpdateData<Data> = Partial<Data>;
-
-abstract class BaseService<
+export abstract class BaseService<
   PrimaryKey extends Record<string, string | number>,
   Data extends Record<string, any>,
   isAuditable extends boolean = true,
   System extends Record<string, any> = Record<string, never>,
+  CreateData extends Record<string, any> = PrimaryKey & Data,
+  UpdateData extends Record<string, any> = Partial<Data>,
+  Row extends Record<string, any> = Required<PrimaryKey> &
+    Required<Data> &
+    (isAuditable extends true ? Required<Audit> : Record<string, never>) &
+    Required<System>,
 > {
   columnNames: string[];
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
-  createData = {} as CreateData<PrimaryKey, Data>;
   system = {} as System;
-  row = {} as Row<PrimaryKey, Data, isAuditable, System>;
-  updateData = {} as UpdateData<Data>;
-  oldRow = {} as Row<PrimaryKey, Data, isAuditable, System>;
+  createData = {} as CreateData;
+  updateData = {} as UpdateData;
+  row = {} as Row;
+  oldRow = {} as Row;
 
   /**
    * Constructs a new instance of the Service class.
@@ -85,11 +84,7 @@ abstract class BaseService<
    * @param userUUId - an optional user UUID to set in the audit columns
    * @returns a Promise that resolves to the inserted row
    */
-  async create(
-    query: Query,
-    createData: CreateData<PrimaryKey, Data>,
-    userUUId?: string,
-  ) {
+  async create(query: Query, createData: CreateData, userUUId?: string) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
     debug.write(
@@ -122,7 +117,7 @@ abstract class BaseService<
       this.tableName,
       { ...this.createData, ...this.system, ...audit },
       this.columnNames,
-    )) as Row<PrimaryKey, Data, isAuditable, System>;
+    )) as Row;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.postCreate();
     debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
@@ -167,7 +162,7 @@ abstract class BaseService<
       {
         columnNames: this.columnNames,
       },
-    )) as Row<PrimaryKey, Data, isAuditable, System>;
+    )) as Row;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.postFindOne();
     debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
@@ -185,9 +180,9 @@ abstract class BaseService<
   async update(
     query: Query,
     primaryKey: PrimaryKey,
-    updateData: UpdateData<Data>,
+    updateData: UpdateData,
     userUUId?: string,
-  ): Promise<Row<PrimaryKey, Data, isAuditable, System>> {
+  ): Promise<Row> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.update`);
     debug.write(
@@ -206,7 +201,7 @@ abstract class BaseService<
         columnNames: this.columnNames,
         forUpdate: true,
       },
-    )) as Row<PrimaryKey, Data, isAuditable, System>;
+    )) as Row;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     const mergedRow = Object.assign({}, this.row, updateData);
     if (
@@ -233,7 +228,7 @@ abstract class BaseService<
         this.primaryKey,
         { ...this.updateData, ...this.system, ...audit },
         this.columnNames,
-      )) as Row<PrimaryKey, Data, isAuditable, System>;
+      )) as Row;
       debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
       await this.postUpdate();
     }
@@ -260,7 +255,7 @@ abstract class BaseService<
       {
         forUpdate: true,
       },
-    )) as Row<PrimaryKey, Data, isAuditable, System>;
+    )) as Row;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.preDelete();
     debug.write(MessageType.Step, 'Deleting row...');
@@ -329,5 +324,3 @@ abstract class BaseService<
    */
   async postDelete(): Promise<void> {}
 }
-
-export { BaseService, CreateData, Query, Row, UpdateData };

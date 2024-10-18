@@ -1,14 +1,12 @@
 import { Query } from 'database';
-type CreateData<PrimaryKey, Data> = PrimaryKey & Data;
+export { Query };
 type Audit = {
     creation_date?: Date;
     created_by?: string;
     last_update_date?: Date;
     last_updated_by?: string;
 };
-type Row<PrimaryKey, Data, isAuditable, System> = Required<PrimaryKey> & Required<Data> & (isAuditable extends true ? Required<Audit> : Record<string, never>) & Required<System>;
-type UpdateData<Data> = Partial<Data>;
-declare abstract class BaseService<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, isAuditable extends boolean = true, System extends Record<string, any> = Record<string, never>> {
+export declare abstract class BaseService<PrimaryKey extends Record<string, string | number>, Data extends Record<string, any>, isAuditable extends boolean = true, System extends Record<string, any> = Record<string, never>, CreateData extends Record<string, any> = PrimaryKey & Data, UpdateData extends Record<string, any> = Partial<Data>, Row extends Record<string, any> = Required<PrimaryKey> & Required<Data> & (isAuditable extends true ? Required<Audit> : Record<string, never>) & Required<System>> {
     readonly debugSource: string;
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
@@ -18,11 +16,11 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
     columnNames: string[];
     query: Query;
     primaryKey: PrimaryKey;
-    createData: CreateData<PrimaryKey, Data>;
     system: System;
-    row: Row<PrimaryKey, Data, isAuditable, System>;
-    updateData: UpdateData<Data>;
-    oldRow: Row<PrimaryKey, Data, isAuditable, System>;
+    createData: CreateData;
+    updateData: UpdateData;
+    row: Row;
+    oldRow: Row;
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages
@@ -40,7 +38,7 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
      * @param userUUId - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the inserted row
      */
-    create(query: Query, createData: CreateData<PrimaryKey, Data>, userUUId?: string): Promise<Row<PrimaryKey, Data, isAuditable, System>>;
+    create(query: Query, createData: CreateData, userUUId?: string): Promise<Row>;
     /**
      * Find rows in the database table.
      * @param query - a Query object for the database connection
@@ -53,7 +51,7 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
      * @param primaryKey - the primary key of the row to find
      * @returns a Promise that resolves to the found row
      */
-    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row<PrimaryKey, Data, isAuditable, System>>;
+    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row>;
     /**
      * Updates a single row in the database table by primary key.
      * @param query - a Query object for the database connection
@@ -62,7 +60,7 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
      * @param userUUId - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the updated row
      */
-    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData<Data>, userUUId?: string): Promise<Row<PrimaryKey, Data, isAuditable, System>>;
+    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData, userUUId?: string): Promise<Row>;
     /**
      * Deletes a row in the database table by primary key.
      * @param query - a Query object for the database connection
@@ -121,4 +119,3 @@ declare abstract class BaseService<PrimaryKey extends Record<string, string | nu
      */
     postDelete(): Promise<void>;
 }
-export { BaseService, CreateData, Query, Row, UpdateData };

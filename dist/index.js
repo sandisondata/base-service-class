@@ -38,10 +38,10 @@ class BaseService {
         this.systemColumnNames = systemColumnNames;
         this.query = {};
         this.primaryKey = {};
-        this.createData = {};
         this.system = {};
-        this.row = {};
+        this.createData = {};
         this.updateData = {};
+        this.row = {};
         this.oldRow = {};
         /**
          * The columnNames property is an array of column names in the database table
