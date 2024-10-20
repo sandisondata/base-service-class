@@ -42,7 +42,7 @@ class BaseService {
         this.updateData = {};
         this.row = {};
         this.system = {};
-        this.oldRow = {};
+        this.existingRow = {};
         /**
          * The columnNames property is an array of column names in the database table
          * that are relevant to the Service class.
@@ -78,11 +78,11 @@ class BaseService {
             this.createData = Object.assign({}, createData);
             this.system = {};
             yield this.preCreate();
-            debug.write(node_debug_1.MessageType.Step, 'Creating row...');
             const audit = {};
             if (this.isAuditable && typeof userUUId !== 'undefined') {
                 audit.created_by = audit.last_updated_by = userUUId;
             }
+            debug.write(node_debug_1.MessageType.Step, 'Creating row...');
             this.row = (yield (0, database_helpers_1.createRow)(this.query, this.tableName, Object.assign(Object.assign(Object.assign({}, this.createData), this.system), audit), this.columnNames));
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
             yield this.postCreate();
@@ -146,18 +146,16 @@ class BaseService {
                 (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''));
             this.primaryKey = Object.assign({}, primaryKey);
             debug.write(node_debug_1.MessageType.Step, 'Finding row by primary key...');
-            this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
+            this.existingRow = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
                 columnNames: this.columnNames,
                 forUpdate: true,
             }));
-            debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
+            debug.write(node_debug_1.MessageType.Value, `this.existingRow=${JSON.stringify(this.existingRow)}`);
             const mergedRow = Object.assign({}, this.row, updateData);
-            if (!(0, node_utilities_1.areObjectsEqual)((0, node_utilities_1.pickObjectKeys)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pickObjectKeys)(this.row, this.dataColumnNames))) {
+            if (!(0, node_utilities_1.areObjectsEqual)((0, node_utilities_1.pickObjectKeys)(mergedRow, this.dataColumnNames), (0, node_utilities_1.pickObjectKeys)(this.existingRow, this.dataColumnNames))) {
                 this.updateData = Object.assign({}, (0, node_utilities_1.pickObjectKeys)(updateData, this.dataColumnNames));
                 this.system = {};
                 yield this.preUpdate();
-                debug.write(node_debug_1.MessageType.Step, 'Updating row...');
-                this.oldRow = Object.assign({}, this.row);
                 const audit = {};
                 if (this.isAuditable) {
                     audit.last_update_date = new Date();
@@ -165,6 +163,7 @@ class BaseService {
                         audit.last_updated_by = userUUId;
                     }
                 }
+                debug.write(node_debug_1.MessageType.Step, 'Updating row...');
                 this.row = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData), this.system), audit), this.columnNames));
                 debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
                 yield this.postUpdate();
@@ -186,10 +185,10 @@ class BaseService {
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
             this.primaryKey = Object.assign({}, primaryKey);
             debug.write(node_debug_1.MessageType.Step, 'Finding row by primary key...');
-            this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
+            this.existingRow = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
                 forUpdate: true,
             }));
-            debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
+            debug.write(node_debug_1.MessageType.Value, `this.existingRow=${JSON.stringify(this.existingRow)}`);
             yield this.preDelete();
             debug.write(node_debug_1.MessageType.Step, 'Deleting row...');
             yield (0, database_helpers_1.deleteRow)(this.query, this.tableName, this.primaryKey);

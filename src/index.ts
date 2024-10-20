@@ -9,7 +9,9 @@ import {
 import { Debug, MessageType } from 'node-debug';
 import { areObjectsEqual, pickObjectKeys } from 'node-utilities';
 
-type Audit = {
+export { Query };
+
+export type Audit = {
   creation_date?: Date;
   created_by?: string;
   last_update_date?: Date;
@@ -22,8 +24,6 @@ const auditColumnNames = [
   'last_update_date',
   'last_updated_by',
 ];
-
-export { Query };
 
 export abstract class BaseService<
   PrimaryKey extends Record<string, any>,
@@ -39,7 +39,7 @@ export abstract class BaseService<
   updateData = {} as UpdateData;
   row = {} as Row;
   system = {} as System;
-  oldRow = {} as Row;
+  existingRow = {} as Row;
 
   /**
    * Constructs a new instance of the Service class.
@@ -102,11 +102,11 @@ export abstract class BaseService<
     this.createData = Object.assign({}, createData);
     this.system = {} as System;
     await this.preCreate();
-    debug.write(MessageType.Step, 'Creating row...');
     const audit: Audit = {};
     if (this.isAuditable && typeof userUUId !== 'undefined') {
       audit.created_by = audit.last_updated_by = userUUId;
     }
+    debug.write(MessageType.Step, 'Creating row...');
     this.row = (await createRow(
       this.query,
       this.tableName,
@@ -188,7 +188,7 @@ export abstract class BaseService<
     );
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
-    this.row = (await findByPrimaryKey(
+    this.existingRow = (await findByPrimaryKey(
       this.query,
       this.tableName,
       this.primaryKey,
@@ -197,12 +197,15 @@ export abstract class BaseService<
         forUpdate: true,
       },
     )) as Row;
-    debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
+    debug.write(
+      MessageType.Value,
+      `this.existingRow=${JSON.stringify(this.existingRow)}`,
+    );
     const mergedRow = Object.assign({}, this.row, updateData);
     if (
       !areObjectsEqual(
         pickObjectKeys(mergedRow, this.dataColumnNames),
-        pickObjectKeys(this.row, this.dataColumnNames),
+        pickObjectKeys(this.existingRow, this.dataColumnNames),
       )
     ) {
       this.updateData = Object.assign(
@@ -211,8 +214,6 @@ export abstract class BaseService<
       );
       this.system = {} as System;
       await this.preUpdate();
-      debug.write(MessageType.Step, 'Updating row...');
-      this.oldRow = Object.assign({}, this.row);
       const audit: Audit = {};
       if (this.isAuditable) {
         audit.last_update_date = new Date();
@@ -220,6 +221,7 @@ export abstract class BaseService<
           audit.last_updated_by = userUUId;
         }
       }
+      debug.write(MessageType.Step, 'Updating row...');
       this.row = (await updateRow(
         this.query,
         this.tableName,
@@ -246,7 +248,7 @@ export abstract class BaseService<
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
-    this.row = (await findByPrimaryKey(
+    this.existingRow = (await findByPrimaryKey(
       this.query,
       this.tableName,
       this.primaryKey,
@@ -254,7 +256,10 @@ export abstract class BaseService<
         forUpdate: true,
       },
     )) as Row;
-    debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
+    debug.write(
+      MessageType.Value,
+      `this.existingRow=${JSON.stringify(this.existingRow)}`,
+    );
     await this.preDelete();
     debug.write(MessageType.Step, 'Deleting row...');
     await deleteRow(this.query, this.tableName, this.primaryKey);

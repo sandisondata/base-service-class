@@ -1,5 +1,11 @@
 import { Query } from 'database';
 export { Query };
+export type Audit = {
+    creation_date?: Date;
+    created_by?: string;
+    last_update_date?: Date;
+    last_updated_by?: string;
+};
 export declare abstract class BaseService<PrimaryKey extends Record<string, any>, CreateData extends Record<string, any>, UpdateData extends Record<string, any>, Row extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
     readonly debugSource: string;
     readonly tableName: string;
@@ -14,7 +20,7 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     updateData: UpdateData;
     row: Row;
     system: System;
-    oldRow: Row;
+    existingRow: Row;
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages
