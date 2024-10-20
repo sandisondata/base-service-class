@@ -168,9 +168,13 @@ class BaseService {
                 this.updatedRow = (yield (0, database_helpers_1.updateRow)(this.query, this.tableName, this.primaryKey, Object.assign(Object.assign(Object.assign({}, this.updateData), this.system), audit), this.columnNames));
                 debug.write(node_debug_1.MessageType.Value, `this.updatedRow=${JSON.stringify(this.updatedRow)}`);
                 yield this.postUpdate();
+                debug.write(node_debug_1.MessageType.Exit, `this.updatedRow=${JSON.stringify(this.updatedRow)}`);
+                return this.updatedRow;
             }
-            debug.write(node_debug_1.MessageType.Exit, `this.updatedRow=${JSON.stringify(this.updatedRow)}`);
-            return this.updatedRow;
+            else {
+                debug.write(node_debug_1.MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
+                return this.row;
+            }
         });
     }
     /**
