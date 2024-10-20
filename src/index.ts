@@ -39,7 +39,8 @@ export abstract class BaseService<
   updateData = {} as UpdateData;
   row = {} as Row;
   system = {} as System;
-  existingRow = {} as Row;
+  createdRow = {} as Row;
+  updatedRow = {} as Row;
 
   /**
    * Constructs a new instance of the Service class.
@@ -107,16 +108,22 @@ export abstract class BaseService<
       audit.created_by = audit.last_updated_by = userUUId;
     }
     debug.write(MessageType.Step, 'Creating row...');
-    this.row = (await createRow(
+    this.createdRow = (await createRow(
       this.query,
       this.tableName,
       { ...this.createData, ...this.system, ...audit },
       this.columnNames,
     )) as Row;
-    debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
+    debug.write(
+      MessageType.Value,
+      `this.createdRow=${JSON.stringify(this.createdRow)}`,
+    );
     await this.postCreate();
-    debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
-    return this.row;
+    debug.write(
+      MessageType.Exit,
+      `this.createdRow=${JSON.stringify(this.createdRow)}`,
+    );
+    return this.createdRow;
   }
 
   /**
@@ -188,7 +195,7 @@ export abstract class BaseService<
     );
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
-    this.existingRow = (await findByPrimaryKey(
+    this.row = (await findByPrimaryKey(
       this.query,
       this.tableName,
       this.primaryKey,
@@ -197,15 +204,12 @@ export abstract class BaseService<
         forUpdate: true,
       },
     )) as Row;
-    debug.write(
-      MessageType.Value,
-      `this.existingRow=${JSON.stringify(this.existingRow)}`,
-    );
+    debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     const mergedRow = Object.assign({}, this.row, updateData);
     if (
       !areObjectsEqual(
         pickObjectKeys(mergedRow, this.dataColumnNames),
-        pickObjectKeys(this.existingRow, this.dataColumnNames),
+        pickObjectKeys(this.row, this.dataColumnNames),
       )
     ) {
       this.updateData = Object.assign(
@@ -222,18 +226,24 @@ export abstract class BaseService<
         }
       }
       debug.write(MessageType.Step, 'Updating row...');
-      this.row = (await updateRow(
+      this.updatedRow = (await updateRow(
         this.query,
         this.tableName,
         this.primaryKey,
         { ...this.updateData, ...this.system, ...audit },
         this.columnNames,
       )) as Row;
-      debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
+      debug.write(
+        MessageType.Value,
+        `this.updatedRow=${JSON.stringify(this.updatedRow)}`,
+      );
       await this.postUpdate();
     }
-    debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
-    return this.row;
+    debug.write(
+      MessageType.Exit,
+      `this.updatedRow=${JSON.stringify(this.updatedRow)}`,
+    );
+    return this.updatedRow;
   }
 
   /**
@@ -248,7 +258,7 @@ export abstract class BaseService<
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
-    this.existingRow = (await findByPrimaryKey(
+    this.row = (await findByPrimaryKey(
       this.query,
       this.tableName,
       this.primaryKey,
@@ -256,10 +266,7 @@ export abstract class BaseService<
         forUpdate: true,
       },
     )) as Row;
-    debug.write(
-      MessageType.Value,
-      `this.existingRow=${JSON.stringify(this.existingRow)}`,
-    );
+    debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.preDelete();
     debug.write(MessageType.Step, 'Deleting row...');
     await deleteRow(this.query, this.tableName, this.primaryKey);
