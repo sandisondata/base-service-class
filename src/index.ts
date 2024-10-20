@@ -238,15 +238,12 @@ export abstract class BaseService<
         `this.updatedRow=${JSON.stringify(this.updatedRow)}`,
       );
       await this.postUpdate();
-      debug.write(
-        MessageType.Exit,
-        `this.updatedRow=${JSON.stringify(this.updatedRow)}`,
-      );
-      return this.updatedRow;
-    } else {
-      debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
-      return this.row;
     }
+    debug.write(
+      MessageType.Exit,
+      `this.updatedRow=${JSON.stringify(this.updatedRow)}`,
+    );
+    return this.updatedRow;
   }
 
   /**
