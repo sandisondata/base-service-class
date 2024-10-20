@@ -32,7 +32,7 @@ export abstract class BaseService<
   Row extends Record<string, any>,
   System extends Record<string, any> = Record<string, never>,
 > {
-  columnNames: string[];
+  readonly columnNames: string[];
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
   createData = {} as CreateData;
@@ -77,16 +77,16 @@ export abstract class BaseService<
    * Creates a new row in the database table.
    * @param query - a Query object for the database connection
    * @param createData - the data to insert into the table
-   * @param userUUId - an optional user UUID to set in the audit columns
+   * @param userUUID - an optional user UUID to set in the audit columns
    * @returns a Promise that resolves to the inserted row
    */
-  async create(query: Query, createData: CreateData, userUUId?: string) {
+  async create(query: Query, createData: CreateData, userUUID?: string) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
     debug.write(
       MessageType.Entry,
       `createData=${JSON.stringify(createData)}` +
-        (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''),
+        (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''),
     );
     this.primaryKey = pickObjectKeys(
       createData,
@@ -104,8 +104,8 @@ export abstract class BaseService<
     this.system = {} as System;
     await this.preCreate();
     const audit: Audit = {};
-    if (this.isAuditable && typeof userUUId !== 'undefined') {
-      audit.created_by = audit.last_updated_by = userUUId;
+    if (this.isAuditable && typeof userUUID !== 'undefined') {
+      audit.created_by = audit.last_updated_by = userUUID;
     }
     debug.write(MessageType.Step, 'Creating row...');
     this.createdRow = (await createRow(
@@ -176,14 +176,14 @@ export abstract class BaseService<
    * @param query - a Query object for the database connection
    * @param primaryKey - the primary key of the row to update
    * @param updateData - the data to update in the row
-   * @param userUUId - an optional user UUID to set in the audit columns
+   * @param userUUID - an optional user UUID to set in the audit columns
    * @returns a Promise that resolves to the updated row
    */
   async update(
     query: Query,
     primaryKey: PrimaryKey,
     updateData: UpdateData,
-    userUUId?: string,
+    userUUID?: string,
   ): Promise<Row> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.update`);
@@ -191,7 +191,7 @@ export abstract class BaseService<
       MessageType.Entry,
       `primaryKey=${JSON.stringify(primaryKey)};` +
         `updateData=${JSON.stringify(updateData)}` +
-        (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''),
+        (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''),
     );
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
@@ -221,8 +221,8 @@ export abstract class BaseService<
       const audit: Audit = {};
       if (this.isAuditable) {
         audit.last_update_date = new Date();
-        if (typeof userUUId !== 'undefined') {
-          audit.last_updated_by = userUUId;
+        if (typeof userUUID !== 'undefined') {
+          audit.last_updated_by = userUUID;
         }
       }
       debug.write(MessageType.Step, 'Updating row...');

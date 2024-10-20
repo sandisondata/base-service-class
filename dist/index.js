@@ -61,15 +61,15 @@ class BaseService {
      * Creates a new row in the database table.
      * @param query - a Query object for the database connection
      * @param createData - the data to insert into the table
-     * @param userUUId - an optional user UUID to set in the audit columns
+     * @param userUUID - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the inserted row
      */
-    create(query, createData, userUUId) {
+    create(query, createData, userUUID) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.create`);
             debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}` +
-                (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''));
+                (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''));
             this.primaryKey = (0, node_utilities_1.pickObjectKeys)(createData, this.primaryKeyColumnNames);
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
             if (Object.keys(this.primaryKey).length) {
@@ -80,8 +80,8 @@ class BaseService {
             this.system = {};
             yield this.preCreate();
             const audit = {};
-            if (this.isAuditable && typeof userUUId !== 'undefined') {
-                audit.created_by = audit.last_updated_by = userUUId;
+            if (this.isAuditable && typeof userUUID !== 'undefined') {
+                audit.created_by = audit.last_updated_by = userUUID;
             }
             debug.write(node_debug_1.MessageType.Step, 'Creating row...');
             this.createdRow = (yield (0, database_helpers_1.createRow)(this.query, this.tableName, Object.assign(Object.assign(Object.assign({}, this.createData), this.system), audit), this.columnNames));
@@ -135,16 +135,16 @@ class BaseService {
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to update
      * @param updateData - the data to update in the row
-     * @param userUUId - an optional user UUID to set in the audit columns
+     * @param userUUID - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the updated row
      */
-    update(query, primaryKey, updateData, userUUId) {
+    update(query, primaryKey, updateData, userUUID) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.update`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)};` +
                 `updateData=${JSON.stringify(updateData)}` +
-                (typeof userUUId !== 'undefined' ? `;userUUId=${userUUId}` : ''));
+                (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''));
             this.primaryKey = Object.assign({}, primaryKey);
             debug.write(node_debug_1.MessageType.Step, 'Finding row by primary key...');
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
@@ -160,8 +160,8 @@ class BaseService {
                 const audit = {};
                 if (this.isAuditable) {
                     audit.last_update_date = new Date();
-                    if (typeof userUUId !== 'undefined') {
-                        audit.last_updated_by = userUUId;
+                    if (typeof userUUID !== 'undefined') {
+                        audit.last_updated_by = userUUID;
                     }
                 }
                 debug.write(node_debug_1.MessageType.Step, 'Updating row...');

@@ -13,7 +13,7 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     readonly dataColumnNames: string[];
     readonly isAuditable: boolean;
     readonly systemColumnNames: string[];
-    columnNames: string[];
+    readonly columnNames: string[];
     query: Query;
     primaryKey: PrimaryKey;
     createData: CreateData;
@@ -36,10 +36,10 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
      * Creates a new row in the database table.
      * @param query - a Query object for the database connection
      * @param createData - the data to insert into the table
-     * @param userUUId - an optional user UUID to set in the audit columns
+     * @param userUUID - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the inserted row
      */
-    create(query: Query, createData: CreateData, userUUId?: string): Promise<Row>;
+    create(query: Query, createData: CreateData, userUUID?: string): Promise<Row>;
     /**
      * Find rows in the database table.
      * @param query - a Query object for the database connection
@@ -58,10 +58,10 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to update
      * @param updateData - the data to update in the row
-     * @param userUUId - an optional user UUID to set in the audit columns
+     * @param userUUID - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the updated row
      */
-    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData, userUUId?: string): Promise<Row>;
+    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData, userUUID?: string): Promise<Row>;
     /**
      * Deletes a row in the database table by primary key.
      * @param query - a Query object for the database connection
