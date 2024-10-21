@@ -1,7 +1,7 @@
 {
   "name": "base-service-class",
   "version": "1.0.0",
-  "description": "Base service class",
+  "description": "Base Service Class",
   "author": "Grant Fortington",
   "private": true,
   "license": "MIT",
