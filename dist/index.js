@@ -110,10 +110,11 @@ class BaseService {
      * Finds a single row in the database table by primary key.
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to find
+     * @param forUpdate - an optional boolean to perform a "SELECT FOR UPDATE" query
      * @returns a Promise that resolves to the found row
      */
-    findOne(query, primaryKey) {
-        return __awaiter(this, void 0, void 0, function* () {
+    findOne(query_1, primaryKey_1) {
+        return __awaiter(this, arguments, void 0, function* (query, primaryKey, forUpdate = false) {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.findOne`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
@@ -123,6 +124,7 @@ class BaseService {
             debug.write(node_debug_1.MessageType.Step, 'Finding row...');
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
                 columnNames: this.columnNames,
+                forUpdate: forUpdate,
             }));
             debug.write(node_debug_1.MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
             yield this.postFindOne();

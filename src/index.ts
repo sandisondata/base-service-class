@@ -144,9 +144,10 @@ export abstract class BaseService<
    * Finds a single row in the database table by primary key.
    * @param query - a Query object for the database connection
    * @param primaryKey - the primary key of the row to find
+   * @param forUpdate - an optional boolean to perform a "SELECT FOR UPDATE" query
    * @returns a Promise that resolves to the found row
    */
-  async findOne(query: Query, primaryKey: PrimaryKey) {
+  async findOne(query: Query, primaryKey: PrimaryKey, forUpdate = false) {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.findOne`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
@@ -163,6 +164,7 @@ export abstract class BaseService<
       this.primaryKey,
       {
         columnNames: this.columnNames,
+        forUpdate: forUpdate,
       },
     )) as Row;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
