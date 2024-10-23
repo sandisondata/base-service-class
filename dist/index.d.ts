@@ -50,10 +50,9 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
      * Finds a single row in the database table by primary key.
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to find
-     * @param forUpdate - an optional boolean to perform a "SELECT FOR UPDATE" query
      * @returns a Promise that resolves to the found row
      */
-    findOne(query: Query, primaryKey: PrimaryKey, forUpdate?: boolean): Promise<Row>;
+    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row>;
     /**
      * Updates a single row in the database table by primary key.
      * @param query - a Query object for the database connection
