@@ -69,7 +69,7 @@ class BaseService {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.create`);
             debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}` +
-                (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''));
+                (typeof userUUID != 'undefined' ? `;userUUID=${userUUID}` : ''));
             this.primaryKey = (0, node_utilities_1.pickObjectKeys)(createData, this.primaryKeyColumnNames);
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
             if (Object.keys(this.primaryKey).length) {
@@ -80,7 +80,7 @@ class BaseService {
             this.system = {};
             yield this.preCreate();
             const audit = {};
-            if (this.isAuditable && typeof userUUID !== 'undefined') {
+            if (this.isAuditable && typeof userUUID != 'undefined') {
                 audit.created_by = audit.last_updated_by = userUUID;
             }
             debug.write(node_debug_1.MessageType.Step, 'Creating row...');
@@ -144,7 +144,7 @@ class BaseService {
             const debug = new node_debug_1.Debug(`${this.debugSource}.update`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)};` +
                 `updateData=${JSON.stringify(updateData)}` +
-                (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''));
+                (typeof userUUID != 'undefined' ? `;userUUID=${userUUID}` : ''));
             this.primaryKey = Object.assign({}, primaryKey);
             debug.write(node_debug_1.MessageType.Step, 'Finding row by primary key...');
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
@@ -160,7 +160,7 @@ class BaseService {
                 const audit = {};
                 if (this.isAuditable) {
                     audit.last_update_date = new Date();
-                    if (typeof userUUID !== 'undefined') {
+                    if (typeof userUUID != 'undefined') {
                         audit.last_updated_by = userUUID;
                     }
                 }

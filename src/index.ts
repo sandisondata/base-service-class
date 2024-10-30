@@ -86,7 +86,7 @@ export abstract class BaseService<
     debug.write(
       MessageType.Entry,
       `createData=${JSON.stringify(createData)}` +
-        (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''),
+        (typeof userUUID != 'undefined' ? `;userUUID=${userUUID}` : ''),
     );
     this.primaryKey = pickObjectKeys(
       createData,
@@ -104,7 +104,7 @@ export abstract class BaseService<
     this.system = {} as System;
     await this.preCreate();
     const audit: Audit = {};
-    if (this.isAuditable && typeof userUUID !== 'undefined') {
+    if (this.isAuditable && typeof userUUID != 'undefined') {
       audit.created_by = audit.last_updated_by = userUUID;
     }
     debug.write(MessageType.Step, 'Creating row...');
@@ -191,7 +191,7 @@ export abstract class BaseService<
       MessageType.Entry,
       `primaryKey=${JSON.stringify(primaryKey)};` +
         `updateData=${JSON.stringify(updateData)}` +
-        (typeof userUUID !== 'undefined' ? `;userUUID=${userUUID}` : ''),
+        (typeof userUUID != 'undefined' ? `;userUUID=${userUUID}` : ''),
     );
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
@@ -221,7 +221,7 @@ export abstract class BaseService<
       const audit: Audit = {};
       if (this.isAuditable) {
         audit.last_update_date = new Date();
-        if (typeof userUUID !== 'undefined') {
+        if (typeof userUUID != 'undefined') {
           audit.last_updated_by = userUUID;
         }
       }
