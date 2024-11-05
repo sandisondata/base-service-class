@@ -17,11 +17,11 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     query: Query;
     primaryKey: PrimaryKey;
     createData: CreateData;
-    updateData: UpdateData;
-    row: Row;
-    createdRow: Row;
-    updatedRow: Row;
     system: System;
+    createdRow: Row;
+    row: Row;
+    updateData: UpdateData;
+    updatedRow: Row;
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages

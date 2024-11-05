@@ -36,11 +36,11 @@ export abstract class BaseService<
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
   createData = {} as CreateData;
-  updateData = {} as UpdateData;
-  row = {} as Row;
-  createdRow = {} as Row;
-  updatedRow = {} as Row;
   system = {} as System;
+  createdRow = {} as Row;
+  row = {} as Row;
+  updateData = {} as UpdateData;
+  updatedRow = {} as Row;
 
   /**
    * Constructs a new instance of the Service class.
