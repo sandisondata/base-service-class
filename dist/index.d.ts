@@ -19,9 +19,9 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     createData: CreateData;
     updateData: UpdateData;
     row: Row;
-    system: System;
     createdRow: Row;
     updatedRow: Row;
+    system: System;
     /**
      * Constructs a new instance of the Service class.
      * @param debugSource - a string identifying the source of debug messages

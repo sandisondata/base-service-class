@@ -38,9 +38,9 @@ export abstract class BaseService<
   createData = {} as CreateData;
   updateData = {} as UpdateData;
   row = {} as Row;
-  system = {} as System;
   createdRow = {} as Row;
   updatedRow = {} as Row;
+  system = {} as System;
 
   /**
    * Constructs a new instance of the Service class.
@@ -80,7 +80,11 @@ export abstract class BaseService<
    * @param userUUID - an optional user UUID to set in the audit columns
    * @returns a Promise that resolves to the inserted row
    */
-  async create(query: Query, createData: CreateData, userUUID?: string) {
+  async create(
+    query: Query,
+    createData: CreateData,
+    userUUID?: string,
+  ): Promise<Row> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
     debug.write(
@@ -146,7 +150,7 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to find
    * @returns a Promise that resolves to the found row
    */
-  async findOne(query: Query, primaryKey: PrimaryKey) {
+  async findOne(query: Query, primaryKey: PrimaryKey): Promise<Row> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.findOne`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
@@ -212,10 +216,7 @@ export abstract class BaseService<
         pickObjectKeys(this.row, this.dataColumnNames),
       )
     ) {
-      this.updateData = Object.assign(
-        {},
-        pickObjectKeys(updateData, this.dataColumnNames) as UpdateData,
-      );
+      this.updateData = Object.assign({}, updateData);
       this.system = {} as System;
       await this.preUpdate();
       const audit: Audit = {};
