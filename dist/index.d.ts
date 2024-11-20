@@ -11,27 +11,26 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
     readonly dataColumnNames: string[];
-    readonly isAuditable: boolean;
     readonly systemColumnNames: string[];
     readonly columnNames: string[];
     query: Query;
     primaryKey: PrimaryKey;
     createData: CreateData;
+    audit: Audit;
     system: System;
     createdRow: Row;
     row: Row;
     updateData: UpdateData;
     updatedRow: Row;
     /**
-     * Constructs a new instance of the Service class.
+     * Constructs a new instance of the BaseService class.
      * @param debugSource - a string identifying the source of debug messages
      * @param tableName - the name of the database table
      * @param primaryKeyColumnNames - an array of column names that make up the primary key
      * @param dataColumnNames - an array of column names that store data
-     * @param isAuditable - a boolean indicating if the table has audit columns
      * @param systemColumnNames - an array of column names that store system data
      */
-    constructor(debugSource: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], isAuditable?: boolean, systemColumnNames?: string[]);
+    constructor(debugSource: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], systemColumnNames?: string[]);
     /**
      * Creates a new row in the database table.
      * @param query - a Query object for the database connection
