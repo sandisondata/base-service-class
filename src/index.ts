@@ -36,6 +36,7 @@ export abstract class BaseService<
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
   createData = {} as CreateData;
+  audit = {} as Audit;
   system = {} as System;
   createdRow = {} as Row;
   row = {} as Row;
@@ -43,12 +44,11 @@ export abstract class BaseService<
   updatedRow = {} as Row;
 
   /**
-   * Constructs a new instance of the Service class.
+   * Constructs a new instance of the BaseService class.
    * @param debugSource - a string identifying the source of debug messages
    * @param tableName - the name of the database table
    * @param primaryKeyColumnNames - an array of column names that make up the primary key
    * @param dataColumnNames - an array of column names that store data
-   * @param isAuditable - a boolean indicating if the table has audit columns
    * @param systemColumnNames - an array of column names that store system data
    */
   constructor(
@@ -56,19 +56,14 @@ export abstract class BaseService<
     readonly tableName: string,
     readonly primaryKeyColumnNames: string[],
     readonly dataColumnNames: string[],
-    readonly isAuditable: boolean = true,
     readonly systemColumnNames: string[] = [],
   ) {
-    /**
-     * The columnNames property is an array of column names in the database table
-     * that are relevant to the Service class.
-     * It is a combination of the primary key columns, data columns,
-     * audit columns (if isAuditable is true), and system columns.
-     */
+    // Combine all relevant column names into a single array
+    // for easy access throughout the class.
     this.columnNames = [
       ...primaryKeyColumnNames,
       ...dataColumnNames,
-      ...(isAuditable ? auditColumnNames : []),
+      ...auditColumnNames,
       ...systemColumnNames,
     ];
   }
@@ -105,17 +100,17 @@ export abstract class BaseService<
       await checkPrimaryKey(this.query, this.tableName, this.primaryKey);
     }
     this.createData = Object.assign({}, createData);
+    this.audit = {};
+    if (typeof userUUID != 'undefined') {
+      this.audit.created_by = this.audit.last_updated_by = userUUID;
+    }
     this.system = {} as System;
     await this.preCreate();
-    const audit: Audit = {};
-    if (this.isAuditable && typeof userUUID != 'undefined') {
-      audit.created_by = audit.last_updated_by = userUUID;
-    }
     debug.write(MessageType.Step, 'Creating row...');
     this.createdRow = (await createRow(
       this.query,
       this.tableName,
-      { ...this.createData, ...this.system, ...audit },
+      { ...this.createData, ...this.audit, ...this.system },
       this.columnNames,
     )) as Row;
     debug.write(
@@ -217,21 +212,19 @@ export abstract class BaseService<
       )
     ) {
       this.updateData = Object.assign({}, updateData);
+      this.audit = {};
+      this.audit.last_update_date = new Date();
+      if (typeof userUUID != 'undefined') {
+        this.audit.last_updated_by = userUUID;
+      }
       this.system = {} as System;
       await this.preUpdate();
-      const audit: Audit = {};
-      if (this.isAuditable) {
-        audit.last_update_date = new Date();
-        if (typeof userUUID != 'undefined') {
-          audit.last_updated_by = userUUID;
-        }
-      }
       debug.write(MessageType.Step, 'Updating row...');
       this.updatedRow = (await updateRow(
         this.query,
         this.tableName,
         this.primaryKey,
-        { ...this.updateData, ...this.system, ...audit },
+        { ...this.updateData, ...this.audit, ...this.system },
         this.columnNames,
       )) as Row;
       debug.write(
