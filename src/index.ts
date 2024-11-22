@@ -25,23 +25,34 @@ const auditColumnNames = [
   'last_updated_by',
 ];
 
+export type CreateData<
+  PrimaryKey extends Record<string, any>,
+  Data extends Record<string, any>,
+> = PrimaryKey & Data;
+
+export type UpdateData<Data extends Record<string, any>> = Partial<Data>;
+
+export type Row<
+  PrimaryKey extends Record<string, any>,
+  Data extends Record<string, any>,
+  System extends Record<string, any> = Record<string, never>,
+> = Required<PrimaryKey & Data & Audit & System>;
+
 export abstract class BaseService<
   PrimaryKey extends Record<string, any>,
-  CreateData extends Record<string, any>,
-  UpdateData extends Record<string, any>,
-  Row extends Record<string, any>,
+  Data extends Record<string, any>,
   System extends Record<string, any> = Record<string, never>,
 > {
   readonly columnNames: string[];
   query = {} as Query;
   primaryKey = {} as PrimaryKey;
-  createData = {} as CreateData;
+  createData = {} as CreateData<PrimaryKey, Data>;
   audit = {} as Audit;
   system = {} as System;
-  createdRow = {} as Row;
-  row = {} as Row;
-  updateData = {} as UpdateData;
-  updatedRow = {} as Row;
+  createdRow = {} as Row<PrimaryKey, Data, System>;
+  row = {} as Row<PrimaryKey, Data, System>;
+  updateData = {} as UpdateData<Data>;
+  updatedRow = {} as Row<PrimaryKey, Data, System>;
 
   /**
    * Constructs a new instance of the BaseService class.
@@ -77,9 +88,9 @@ export abstract class BaseService<
    */
   async create(
     query: Query,
-    createData: CreateData,
+    createData: CreateData<PrimaryKey, Data>,
     userUUID?: string,
-  ): Promise<Row> {
+  ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
     debug.write(
@@ -112,7 +123,7 @@ export abstract class BaseService<
       this.tableName,
       { ...this.createData, ...this.audit, ...this.system },
       this.columnNames,
-    )) as Row;
+    )) as Row<PrimaryKey, Data, System>;
     debug.write(
       MessageType.Value,
       `this.createdRow=${JSON.stringify(this.createdRow)}`,
@@ -145,15 +156,14 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to find
    * @returns a Promise that resolves to the found row
    */
-  async findOne(query: Query, primaryKey: PrimaryKey): Promise<Row> {
+  async findOne(
+    query: Query,
+    primaryKey: PrimaryKey,
+  ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.findOne`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
-    debug.write(
-      MessageType.Value,
-      `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
-    );
     await this.preFindOne();
     debug.write(MessageType.Step, 'Finding row...');
     this.row = (await findByPrimaryKey(
@@ -163,7 +173,7 @@ export abstract class BaseService<
       {
         columnNames: this.columnNames,
       },
-    )) as Row;
+    )) as Row<PrimaryKey, Data, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.postFindOne();
     debug.write(MessageType.Exit, `this.row=${JSON.stringify(this.row)}`);
@@ -181,9 +191,9 @@ export abstract class BaseService<
   async update(
     query: Query,
     primaryKey: PrimaryKey,
-    updateData: UpdateData,
+    updateData: UpdateData<Data>,
     userUUID?: string,
-  ): Promise<Row> {
+  ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.update`);
     debug.write(
@@ -202,7 +212,7 @@ export abstract class BaseService<
         columnNames: this.columnNames,
         forUpdate: true,
       },
-    )) as Row;
+    )) as Row<PrimaryKey, Data, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     const mergedRow = Object.assign({}, this.row, updateData);
     if (
@@ -226,7 +236,7 @@ export abstract class BaseService<
         this.primaryKey,
         { ...this.updateData, ...this.audit, ...this.system },
         this.columnNames,
-      )) as Row;
+      )) as Row<PrimaryKey, Data, System>;
       debug.write(
         MessageType.Value,
         `this.updatedRow=${JSON.stringify(this.updatedRow)}`,
@@ -262,7 +272,7 @@ export abstract class BaseService<
       {
         forUpdate: true,
       },
-    )) as Row;
+    )) as Row<PrimaryKey, Data, System>;
     debug.write(MessageType.Value, `this.row=${JSON.stringify(this.row)}`);
     await this.preDelete();
     debug.write(MessageType.Step, 'Deleting row...');

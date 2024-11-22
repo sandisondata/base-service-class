@@ -113,7 +113,6 @@ class BaseService {
             const debug = new node_debug_1.Debug(`${this.debugSource}.findOne`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
             this.primaryKey = Object.assign({}, primaryKey);
-            debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
             yield this.preFindOne();
             debug.write(node_debug_1.MessageType.Step, 'Finding row...');
             this.row = (yield (0, database_helpers_1.findByPrimaryKey)(this.query, this.tableName, this.primaryKey, {
