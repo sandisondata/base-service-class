@@ -7,6 +7,9 @@ export type Audit = {
     last_updated_by?: string;
 };
 export type CreateData<PrimaryKey extends Record<string, any>, Data extends Record<string, any>> = PrimaryKey & Data;
+export type DefaultPrimaryKey<T> = {
+    [K in keyof T as Omit<T, K> extends T ? K : never]: () => Promise<Exclude<T[K], undefined>>;
+};
 export type UpdateData<Data extends Record<string, any>> = Partial<Data>;
 export type Row<PrimaryKey extends Record<string, any>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> = Required<PrimaryKey & Data & Audit & System>;
 export declare abstract class BaseService<PrimaryKey extends Record<string, any>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
@@ -38,10 +41,15 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
      * Creates a new row in the database table.
      * @param query - a Query object for the database connection
      * @param createData - the data to insert into the table
-     * @param userUUID - an optional user UUID to set in the audit columns
+     * @param options - an optional object with the following properties:
+     * - defaultPrimaryKey: an object with default values for the primary key
+     * - userUUID: a user UUID to set in the audit columns
      * @returns a Promise that resolves to the inserted row
      */
-    create(query: Query, createData: CreateData<PrimaryKey, Data>, userUUID?: string): Promise<Row<PrimaryKey, Data, System>>;
+    create(query: Query, createData: CreateData<PrimaryKey, Data>, options?: {
+        defaultPrimaryKey?: DefaultPrimaryKey<PrimaryKey>;
+        userUUID?: string;
+    }): Promise<Row<PrimaryKey, Data, System>>;
     /**
      * Find rows in the database table.
      * @param query - a Query object for the database connection
