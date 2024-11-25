@@ -30,12 +30,6 @@ export type CreateData<
   Data extends Record<string, any>,
 > = PrimaryKey & Data;
 
-export type DefaultPrimaryKey<T> = {
-  [K in keyof T as Omit<T, K> extends T ? K : never]: () => Promise<
-    Exclude<T[K], undefined>
-  >;
-};
-
 export type UpdateData<Data extends Record<string, any>> = Partial<Data>;
 
 export type Row<
@@ -89,27 +83,20 @@ export abstract class BaseService<
    * Creates a new row in the database table.
    * @param query - a Query object for the database connection
    * @param createData - the data to insert into the table
-   * @param options - an optional object with the following properties:
-   * - defaultPrimaryKey: an object with default values for the primary key
-   * - userUUID: a user UUID to set in the audit columns
+   * @param userUUID - an optional user UUID to set in the audit columns
    * @returns a Promise that resolves to the inserted row
    */
   async create(
     query: Query,
     createData: CreateData<PrimaryKey, Data>,
-    options?: {
-      defaultPrimaryKey?: DefaultPrimaryKey<PrimaryKey>;
-      userUUID?: string;
-    },
+    userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
     const debug = new Debug(`${this.debugSource}.create`);
     debug.write(
       MessageType.Entry,
       `createData=${JSON.stringify(createData)}` +
-        (typeof options != 'undefined'
-          ? `;options=${JSON.stringify(options)}`
-          : ''),
+        (typeof userUUID != 'undefined' ? `;userUUID=$userUUID}` : ''),
     );
     this.primaryKey = pickObjectKeys(
       createData,
@@ -120,24 +107,15 @@ export abstract class BaseService<
       `this.primaryKey=${JSON.stringify(this.primaryKey)}`,
     );
     if (
-      typeof options != 'undefined' &&
-      typeof options.defaultPrimaryKey != 'undefined'
+      Object.keys(this.primaryKey).length == this.primaryKeyColumnNames.length
     ) {
-      for (const key in options.defaultPrimaryKey) {
-        this.primaryKey[key] = await options.defaultPrimaryKey[key]();
-      }
-    }
-    if (Object.keys(this.primaryKey).length) {
       debug.write(MessageType.Step, 'Checking primary key...');
       await checkPrimaryKey(this.query, this.tableName, this.primaryKey);
     }
     this.createData = Object.assign({}, createData);
     this.audit = {};
-    if (
-      typeof options != 'undefined' &&
-      typeof options.userUUID != 'undefined'
-    ) {
-      this.audit.created_by = this.audit.last_updated_by = options.userUUID;
+    if (typeof userUUID != 'undefined') {
+      this.audit.created_by = this.audit.last_updated_by = userUUID;
     }
     this.system = {} as System;
     await this.preCreate();

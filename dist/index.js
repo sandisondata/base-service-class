@@ -56,36 +56,25 @@ class BaseService {
      * Creates a new row in the database table.
      * @param query - a Query object for the database connection
      * @param createData - the data to insert into the table
-     * @param options - an optional object with the following properties:
-     * - defaultPrimaryKey: an object with default values for the primary key
-     * - userUUID: a user UUID to set in the audit columns
+     * @param userUUID - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the inserted row
      */
-    create(query, createData, options) {
+    create(query, createData, userUUID) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
             const debug = new node_debug_1.Debug(`${this.debugSource}.create`);
             debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}` +
-                (typeof options != 'undefined'
-                    ? `;options=${JSON.stringify(options)}`
-                    : ''));
+                (typeof userUUID != 'undefined' ? `;userUUID=$userUUID}` : ''));
             this.primaryKey = (0, node_utilities_1.pickObjectKeys)(createData, this.primaryKeyColumnNames);
             debug.write(node_debug_1.MessageType.Value, `this.primaryKey=${JSON.stringify(this.primaryKey)}`);
-            if (typeof options != 'undefined' &&
-                typeof options.defaultPrimaryKey != 'undefined') {
-                for (const key in options.defaultPrimaryKey) {
-                    this.primaryKey[key] = yield options.defaultPrimaryKey[key]();
-                }
-            }
-            if (Object.keys(this.primaryKey).length) {
+            if (Object.keys(this.primaryKey).length == this.primaryKeyColumnNames.length) {
                 debug.write(node_debug_1.MessageType.Step, 'Checking primary key...');
                 yield (0, database_helpers_1.checkPrimaryKey)(this.query, this.tableName, this.primaryKey);
             }
             this.createData = Object.assign({}, createData);
             this.audit = {};
-            if (typeof options != 'undefined' &&
-                typeof options.userUUID != 'undefined') {
-                this.audit.created_by = this.audit.last_updated_by = options.userUUID;
+            if (typeof userUUID != 'undefined') {
+                this.audit.created_by = this.audit.last_updated_by = userUUID;
             }
             this.system = {};
             yield this.preCreate();
