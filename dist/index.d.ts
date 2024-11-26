@@ -7,8 +7,8 @@ export type Audit = {
     last_updated_by?: string;
 };
 export type CreateData<PrimaryKey extends Record<string, any>, Data extends Record<string, any>> = PrimaryKey & Data;
-export type UpdateData<Data extends Record<string, any>> = Partial<Data>;
 export type Row<PrimaryKey extends Record<string, any>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> = Required<PrimaryKey & Data & Audit & System>;
+export type UpdateData<Data extends Record<string, any>> = Partial<Data>;
 export declare abstract class BaseService<PrimaryKey extends Record<string, any>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
     readonly debugSource: string;
     readonly tableName: string;
