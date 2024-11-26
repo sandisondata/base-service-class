@@ -92,7 +92,7 @@ export abstract class BaseService<
     userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.create`);
+    const debug = new Debug(`${this.debugSource}.create(base)`);
     debug.write(
       MessageType.Entry,
       `createData=${JSON.stringify(createData)}` +
@@ -145,7 +145,7 @@ export abstract class BaseService<
    */
   async find(query: Query) {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.find`);
+    const debug = new Debug(`${this.debugSource}.find(base)`);
     await this.preFind();
     debug.write(MessageType.Step, 'Finding rows...');
     await this.postFind();
@@ -163,7 +163,7 @@ export abstract class BaseService<
     primaryKey: PrimaryKey,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.findOne`);
+    const debug = new Debug(`${this.debugSource}.findOne(base)`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
     await this.preFindOne();
@@ -197,7 +197,7 @@ export abstract class BaseService<
     userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.update`);
+    const debug = new Debug(`${this.debugSource}.update(base)`);
     debug.write(
       MessageType.Entry,
       `primaryKey=${JSON.stringify(primaryKey)};` +
@@ -263,7 +263,7 @@ export abstract class BaseService<
    */
   async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.delete`);
+    const debug = new Debug(`${this.debugSource}.delete(base)`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');

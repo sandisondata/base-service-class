@@ -62,7 +62,7 @@ class BaseService {
     create(query, createData, userUUID) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
-            const debug = new node_debug_1.Debug(`${this.debugSource}.create`);
+            const debug = new node_debug_1.Debug(`${this.debugSource}.create(base)`);
             debug.write(node_debug_1.MessageType.Entry, `createData=${JSON.stringify(createData)}` +
                 (typeof userUUID != 'undefined' ? `;userUUID=$userUUID}` : ''));
             this.primaryKey = (0, node_utilities_1.pickObjectKeys)(createData, this.primaryKeyColumnNames);
@@ -94,7 +94,7 @@ class BaseService {
     find(query) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
-            const debug = new node_debug_1.Debug(`${this.debugSource}.find`);
+            const debug = new node_debug_1.Debug(`${this.debugSource}.find(base)`);
             yield this.preFind();
             debug.write(node_debug_1.MessageType.Step, 'Finding rows...');
             yield this.postFind();
@@ -110,7 +110,7 @@ class BaseService {
     findOne(query, primaryKey) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
-            const debug = new node_debug_1.Debug(`${this.debugSource}.findOne`);
+            const debug = new node_debug_1.Debug(`${this.debugSource}.findOne(base)`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
             this.primaryKey = Object.assign({}, primaryKey);
             yield this.preFindOne();
@@ -135,7 +135,7 @@ class BaseService {
     update(query, primaryKey, updateData, userUUID) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
-            const debug = new node_debug_1.Debug(`${this.debugSource}.update`);
+            const debug = new node_debug_1.Debug(`${this.debugSource}.update(base)`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)};` +
                 `updateData=${JSON.stringify(updateData)}` +
                 (typeof userUUID != 'undefined' ? `;userUUID=${userUUID}` : ''));
@@ -178,7 +178,7 @@ class BaseService {
     delete(query, primaryKey) {
         return __awaiter(this, void 0, void 0, function* () {
             this.query = query;
-            const debug = new node_debug_1.Debug(`${this.debugSource}.delete`);
+            const debug = new node_debug_1.Debug(`${this.debugSource}.delete(base)`);
             debug.write(node_debug_1.MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
             this.primaryKey = Object.assign({}, primaryKey);
             debug.write(node_debug_1.MessageType.Step, 'Finding row by primary key...');
