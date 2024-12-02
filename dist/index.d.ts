@@ -10,7 +10,7 @@ export type CreateData<PrimaryKey extends Record<string, any>, Data extends Reco
 export type Row<PrimaryKey extends Record<string, any>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> = Required<PrimaryKey & Data & Audit & System>;
 export type UpdateData<Data extends Record<string, any>> = Partial<Data>;
 export declare abstract class BaseService<PrimaryKey extends Record<string, any>, Data extends Record<string, any>, System extends Record<string, any> = Record<string, never>> {
-    readonly debugSource: string;
+    readonly name: string;
     readonly tableName: string;
     readonly primaryKeyColumnNames: string[];
     readonly dataColumnNames: string[];
@@ -27,13 +27,13 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
     updatedRow: Row<PrimaryKey, Data, System>;
     /**
      * Constructs a new instance of the BaseService class.
-     * @param debugSource - a string identifying the source of debug messages
+     * @param name - a string identifying the name of the service
      * @param tableName - the name of the database table
      * @param primaryKeyColumnNames - an array of column names that make up the primary key
      * @param dataColumnNames - an array of column names that store data
-     * @param systemColumnNames - an array of column names that store system data
+     * @param systemColumnNames - an optional array of column names that store system data
      */
-    constructor(debugSource: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], systemColumnNames?: string[]);
+    constructor(name: string, tableName: string, primaryKeyColumnNames: string[], dataColumnNames: string[], systemColumnNames?: string[]);
     /**
      * Creates a new row in the database table.
      * @param query - a Query object for the database connection

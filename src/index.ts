@@ -56,14 +56,14 @@ export abstract class BaseService<
 
   /**
    * Constructs a new instance of the BaseService class.
-   * @param debugSource - a string identifying the source of debug messages
+   * @param name - a string identifying the name of the service
    * @param tableName - the name of the database table
    * @param primaryKeyColumnNames - an array of column names that make up the primary key
    * @param dataColumnNames - an array of column names that store data
-   * @param systemColumnNames - an array of column names that store system data
+   * @param systemColumnNames - an optional array of column names that store system data
    */
   constructor(
-    readonly debugSource: string,
+    readonly name: string,
     readonly tableName: string,
     readonly primaryKeyColumnNames: string[],
     readonly dataColumnNames: string[],
@@ -92,7 +92,7 @@ export abstract class BaseService<
     userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.create(base)`);
+    const debug = new Debug(`${this.name}.create(base)`);
     debug.write(
       MessageType.Entry,
       `createData=${JSON.stringify(createData)}` +
@@ -145,7 +145,7 @@ export abstract class BaseService<
    */
   async find(query: Query) {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.find(base)`);
+    const debug = new Debug(`${this.name}.find(base)`);
     await this.preFind();
     debug.write(MessageType.Step, 'Finding rows...');
     await this.postFind();
@@ -163,7 +163,7 @@ export abstract class BaseService<
     primaryKey: PrimaryKey,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.findOne(base)`);
+    const debug = new Debug(`${this.name}.findOne(base)`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
     await this.preFindOne();
@@ -197,7 +197,7 @@ export abstract class BaseService<
     userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.update(base)`);
+    const debug = new Debug(`${this.name}.update(base)`);
     debug.write(
       MessageType.Entry,
       `primaryKey=${JSON.stringify(primaryKey)};` +
@@ -263,7 +263,7 @@ export abstract class BaseService<
    */
   async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
     this.query = query;
-    const debug = new Debug(`${this.debugSource}.delete(base)`);
+    const debug = new Debug(`${this.name}.delete(base)`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
     this.primaryKey = Object.assign({}, primaryKey);
     debug.write(MessageType.Step, 'Finding row by primary key...');
