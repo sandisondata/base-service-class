@@ -54,7 +54,7 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
      * @param primaryKey - the primary key of the row to find
      * @returns a Promise that resolves to the found row
      */
-    findOne(query: Query, primaryKey: PrimaryKey): Promise<Row<PrimaryKey, Data, System>>;
+    findOne(query: Query, primaryKey: Required<PrimaryKey>): Promise<Row<PrimaryKey, Data, System>>;
     /**
      * Updates a single row in the database table by primary key.
      * @param query - a Query object for the database connection
@@ -63,14 +63,14 @@ export declare abstract class BaseService<PrimaryKey extends Record<string, any>
      * @param userUUID - an optional user UUID to set in the audit columns
      * @returns a Promise that resolves to the updated row
      */
-    update(query: Query, primaryKey: PrimaryKey, updateData: UpdateData<Data>, userUUID?: string): Promise<Row<PrimaryKey, Data, System>>;
+    update(query: Query, primaryKey: Required<PrimaryKey>, updateData: UpdateData<Data>, userUUID?: string): Promise<Row<PrimaryKey, Data, System>>;
     /**
      * Deletes a row in the database table by primary key.
      * @param query - a Query object for the database connection
      * @param primaryKey - the primary key of the row to delete
      * @returns a Promise that resolves when the row is deleted
      */
-    delete(query: Query, primaryKey: PrimaryKey): Promise<void>;
+    delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void>;
     /**
      * Called before a row is inserted into the database table.
      * @returns a Promise that resolves when the pre-hook is complete

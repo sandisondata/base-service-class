@@ -160,7 +160,7 @@ export abstract class BaseService<
    */
   async findOne(
     query: Query,
-    primaryKey: PrimaryKey,
+    primaryKey: Required<PrimaryKey>,
   ): Promise<Row<PrimaryKey, Data, System>> {
     this.query = query;
     const debug = new Debug(`${this.name}.findOne(base)`);
@@ -192,7 +192,7 @@ export abstract class BaseService<
    */
   async update(
     query: Query,
-    primaryKey: PrimaryKey,
+    primaryKey: Required<PrimaryKey>,
     updateData: UpdateData<Data>,
     userUUID?: string,
   ): Promise<Row<PrimaryKey, Data, System>> {
@@ -261,7 +261,7 @@ export abstract class BaseService<
    * @param primaryKey - the primary key of the row to delete
    * @returns a Promise that resolves when the row is deleted
    */
-  async delete(query: Query, primaryKey: PrimaryKey): Promise<void> {
+  async delete(query: Query, primaryKey: Required<PrimaryKey>): Promise<void> {
     this.query = query;
     const debug = new Debug(`${this.name}.delete(base)`);
     debug.write(MessageType.Entry, `primaryKey=${JSON.stringify(primaryKey)}`);
